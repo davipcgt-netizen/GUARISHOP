@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GuariShop | Tecnología y Accesorios</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        blackBg: '#050505',
+                        blackCard: '#0f1115',
+                        neon: '#39ff14',
+                        neonHover: '#32e612',
+                        whiteText: '#f8f8f8',
+                        grayText: '#a0a0a0'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { background-color: #050505; color: #f8f8f8; overflow-x: hidden; position: relative; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #111111; border-radius: 4px; border: 1px solid #39ff14; }
+
+        .neon-text { color: #39ff14; text-shadow: 0 0 14px rgba(57, 255, 20, 0.75); }
+        .neon-bg-glow { box-shadow: 0 0 25px rgba(57, 255, 20, 0.35); }
+        
+        /* Marquesina fluida ultra suave */
+        @keyframes marquee { 0% { transform: translate3d(100%, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+        .animate-marquee { display: inline-block; white-space: nowrap; animation: marquee 18s linear infinite; will-change: transform; }
+        @media (min-width: 640px) { .sm\:animate-none { animation: none; transform: none; } }
+
+        /* Partículas flotantes ligeras optimizadas por GPU (cero lag en Android) */
+        @keyframes ambient-float {
+            0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.9); opacity: 0.12; }
+            50% { transform: translate3d(var(--dx), var(--dy), 0) rotate(180deg) scale(1.1); opacity: 0.35; }
+            100% { transform: translate3d(0, 0, 0) rotate(360deg) scale(0.9); opacity: 0.12; }
+        }
+        .bg-particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+            color: #39ff14;
+            animation: ambient-float var(--duration) ease-in-out infinite;
+            will-change: transform, opacity;
+        }
+
+        /* Orbes de luz ambiental parpadeantes de fondo */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.15; filter: blur(50px); }
+            50% { opacity: 0.35; filter: blur(70px); }
+        }
+        .ambient-orb {
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: rgba(57, 255, 20, 0.1);
+            pointer-events: none;
+            z-index: 0;
+            animation: pulse-glow 5s ease-in-out infinite;
+            will-change: opacity, filter;
+        }
+
+        @keyframes float-slow { 0%, 100% { transform: translate3d(0, 0px, 0) rotate(0deg); } 50% { transform: translate3d(0, -20px, 0) rotate(5deg); } }
+        @keyframes float-fast { 0%, 100% { transform: translate3d(0, 0px, 0) rotate(0deg); } 50% { transform: translate3d(0, -12px, 0) rotate(-5deg); } }
+        .animate-float-1 { animation: float-slow 4.5s ease-in-out infinite; will-change: transform; }
+        .animate-float-2 { animation: float-fast 3.2s ease-in-out infinite; animation-delay: 0.8s; will-change: transform; }
+
+        @keyframes gentle-pulse { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.08); } }
+        .hero-glow-pulse { animation: gentle-pulse 4s ease-in-out infinite; will-change: transform, opacity; }
+
+        .glass-nav { background: rgba(5, 5, 5, 0.9); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transform: translate3d(0,0,0); }
+
+        .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); will-change: opacity, transform; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @keyframes pop-spark {
+            0% { transform: translate3d(0,0,0) scale(0.5); opacity: 1; }
+            100% { transform: translate3d(var(--tx), var(--ty), 0) scale(1.4); opacity: 0; }
+        }
+        .spark { position: fixed; pointer-events: none; z-index: 9999; animation: pop-spark 0.45s cubic-bezier(0.25, 1, 0.5, 1) forwards; color: #39ff14; will-change: transform, opacity; }
+
+        .cursor-blink::after { content: '|'; animation: blink 0.9s step-end infinite; color: #39ff14; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.4); } }
+        .liked { color: #ff2a2a !important; animation: heartbeat 0.35s ease-in-out forwards; }
+
+        .touch-press:active { transform: scale(0.97); transition: transform 0.1s ease; }
+
+        .category-tab {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, background-color, border-color;
+        }
+
+        #cart-sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+        .cart-open { transform: translateX(0) !important; }
+        .cart-closed { transform: translateX(100%); }
+
+        #nosotros-modal { transition: opacity 0.3s ease; }
+        .nosotros-open { opacity: 1 !important; pointer-events: auto !important; }
+        .nosotros-card { transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .nosotros-open .nosotros-card { transform: scale(1); }
+    </style>
+</head>
+<body class="font-sans antialiased flex flex-col min-h-screen pb-20 md:pb-0 relative z-10">
+
+    <div id="ambient-particles">
+        <i class="fa-solid fa-bolt bg-particle text-xs" style="top: 4%; left: 6%; --duration: 6s; --dx: 35px; --dy: -45px;"></i>
+        <i class="fa-solid fa-headphones bg-particle text-sm" style="top: 12%; left: 88%; --duration: 8s; --dx: -45px; --dy: 55px;"></i>
+        <i class="fa-solid fa-gamepad bg-particle text-xs" style="top: 24% ; left: 3%; --duration: 7s; --dx: 45px; --dy: 35px;"></i>
+        <i class="fa-solid fa-plug bg-particle text-sm" style="top: 38%; left: 92%; --duration: 6.5s; --dx: -35px; --dy: -40px;"></i>
+        <i class="fa-solid fa-mobile-screen bg-particle text-xs" style="top: 52%; left: 8%; --duration: 8.5s; --dx: 40px; --dy: -50px;"></i>
+        <i class="fa-solid fa-lightbulb bg-particle text-xs" style="top: 66%; left: 90%; --duration: 7.5s; --dx: -30px; --dy: 45px;"></i>
+        <i class="fa-solid fa-shield-halved bg-particle text-sm" style="top: 80%; left: 10%; --duration: 9s; --dx: 50px; --dy: -30px;"></i>
+        <i class="fa-solid fa-microchip bg-particle text-xs" style="top: 92%; left: 82%; --duration: 6s; --dx: -40px; --dy: -35px;"></i>
+    </div>
+
+    <div class="bg-neon text-blackBg py-2 px-4 text-center text-[11px] sm:text-sm font-semibold flex justify-center items-center gap-2 z-50 relative overflow-hidden shadow-md">
+        <div class="w-full whitespace-nowrap flex items-center justify-center">
+            <span class="animate-marquee sm:animate-none sm:mx-auto flex items-center gap-2">
+                <i class="fa-solid fa-truck-fast"></i> Envíos a nivel nacional cobro a destino por <span class="font-black tracking-wider">ZOOM</span> y <span class="font-black tracking-wider">MRW</span>
+            </span>
+        </div>
+    </div>
+
+    <header class="sticky top-0 z-40 bg-blackBg/95 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="flex items-center gap-2.5 group touch-press">
+                <div class="w-10 h-10 bg-blackCard border border-neon rounded-full flex items-center justify-center neon-bg-glow group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-bolt text-neon text-base animate-pulse"></i>
+                </div>
+                <span class="font-display font-bold text-xl tracking-wide uppercase">Guari<span class="neon-text">Shop</span></span>
+            </a>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#catalogo" class="text-whiteText hover:text-neon transition-colors font-medium text-sm uppercase tracking-wider">Catálogo</a>
+                <a href="#" onclick="openNosotros(event)" class="text-whiteText hover:text-neon transition-colors font-medium text-sm uppercase tracking-wider">Nosotros</a>
+            </nav>
+            <button onclick="toggleCart()" class="relative p-2.5 bg-blackCard border border-white/10 hover:border-neon text-whiteText hover:text-neon transition-all hidden md:flex items-center justify-center rounded-xl active:scale-95 shadow-md">
+                <i class="fa-solid fa-cart-shopping text-lg"></i>
+                <span id="cart-count" class="absolute -top-1.5 -right-1.5 bg-neon text-blackBg text-[10px] font-black px-1.5 py-0.2 rounded-full neon-bg-glow transition-transform duration-300">0</span>
+            </button>
+        </div>
+    </header>
+
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 glass-nav border-t border-white/10 z-40 px-6 py-3 flex justify-between items-center shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+        <a href="#" onclick="openNosotros(event)" class="flex flex-col items-center gap-1 text-neon active:scale-90 transition-transform touch-press">
+            <i class="fa-solid fa-store text-lg"></i><span class="text-[9px] font-bold uppercase tracking-wider">Nosotros</span>
+        </a>
+        <a href="#catalogo" class="flex flex-col items-center gap-1 text-grayText hover:text-whiteText active:scale-90 transition-transform touch-press">
+            <i class="fa-solid fa-compass text-lg"></i><span class="text-[9px] font-bold uppercase tracking-wider">Catálogo</span>
+        </a>
+        <button onclick="toggleCart()" class="flex flex-col items-center gap-1 text-grayText hover:text-whiteText relative active:scale-90 transition-transform touch-press">
+            <i class="fa-solid fa-cart-shopping text-lg"></i><span class="text-[9px] font-bold uppercase tracking-wider">Carrito</span>
+            <span id="mobile-cart-count" class="absolute -top-1 -right-2 bg-neon text-blackBg text-[9px] font-black px-1.5 rounded-full">0</span>
+        </button>
+    </nav>
+
+    <section class="relative pt-12 pb-20 overflow-hidden">
+        <div class="ambient-orb top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[600px] h-[350px] sm:h-[600px] bg-neon/15 rounded-full blur-[100px] pointer-events-none hero-glow-pulse"></div>
+        
+        <div class="absolute top-8 left-6 text-neon/35 text-2xl sm:text-3xl animate-float-1 pointer-events-none"><i class="fa-solid fa-headphones"></i></div>
+        <div class="absolute top-24 right-8 text-neon/30 text-3xl sm:text-4xl animate-float-2 pointer-events-none"><i class="fa-solid fa-gamepad"></i></div>
+
+        <div class="max-w-7xl mx-auto px-4 relative z-10 text-center flex flex-col items-center reveal active">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon/50 bg-neon/10 text-neon text-[11px] sm:text-xs font-bold uppercase tracking-widest mb-4 shadow-[0_0_20px_rgba(57,255,20,0.25)] animate-pulse">
+                <i class="fa-solid fa-bolt"></i> Tecnología y Estilo Urbano
+            </div>
+            <h1 class="font-display text-4xl sm:text-7xl font-black mb-4 uppercase tracking-tight leading-tight">
+                El futuro de tu <br/>
+                <span class="neon-text cursor-blink" id="dynamic-text">Setup</span>
+            </h1>
+            <p class="text-grayText text-sm sm:text-base max-w-xl mx-auto mb-8 px-2 font-normal">
+                Encuentra los mejores audífonos, cargadores de carga rápida, forros de protección y luces LED para llevar tu estilo al siguiente nivel.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto px-4">
+                <a href="#catalogo" class="w-full sm:w-auto bg-neon text-blackBg font-bold text-sm sm:text-base px-8 py-4 rounded-xl hover:bg-neonHover transition-all flex items-center justify-center gap-2 uppercase tracking-wide neon-bg-glow touch-press shadow-lg">
+                    <i class="fa-solid fa-bag-shopping"></i> Comprar Ahora
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <main id="catalogo" class="flex-grow max-w-7xl mx-auto px-4 py-10 w-full border-t border-white/10 relative z-10 bg-blackBg/90 rounded-t-[2.5rem] shadow-2xl">
+        <div class="ambient-orb top-20 right-10"></div>
+        <div class="text-center mb-8 reveal">
+            <h2 class="font-display text-2xl sm:text-4xl font-bold uppercase mb-1">Nuestro <span class="text-neon">Catálogo</span></h2>
+            <p class="text-grayText text-xs sm:text-sm">Sincronizado directo desde la nube</p>
+        </div>
+
+        <div class="mb-10 reveal">
+            <div class="flex justify-start sm:justify-center gap-2.5 overflow-x-auto pb-3 px-2 hide-scrollbar snap-x" style="-ms-overflow-style: none; scrollbar-width: none;">
+                <button onclick="filterCategory('todos')" id="btn-cat-todos" class="category-tab snap-center shrink-0 px-5 py-3 rounded-2xl bg-neon text-blackBg font-display font-black text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2 neon-bg-glow touch-press shadow-lg border border-neon" data-category="todos">
+                    <i class="fa-solid fa-border-all text-sm"></i><span>Todos</span>
+                    <span id="badge-total-count" class="bg-blackBg text-neon text-[10px] px-2 py-0.5 rounded-full font-bold ml-0.5">0</span>
+                </button>
+                <button onclick="filterCategory('adifonos')" id="btn-cat-adifonos" class="category-tab snap-center shrink-0 px-4 py-3 rounded-xl bg-blackCard border border-white/10 text-grayText hover:text-whiteText font-bold text-xs uppercase tracking-wider flex items-center gap-2 touch-press" data-category="adifonos">
+                    <i class="fa-solid fa-headphones text-neon text-sm"></i><span>Adifonos</span>
+                </button>
+                <button onclick="filterCategory('cargadores')" id="btn-cat-cargadores" class="category-tab snap-center shrink-0 px-4 py-3 rounded-xl bg-blackCard border border-white/10 text-grayText hover:text-whiteText font-bold text-xs uppercase tracking-wider flex items-center gap-2 touch-press" data-category="cargadores">
+                    <i class="fa-solid fa-plug text-neon text-sm"></i><span>Cargadores</span>
+                </button>
+                <button onclick="filterCategory('forros')" id="btn-cat-forros" class="category-tab snap-center shrink-0 px-4 py-3 rounded-xl bg-blackCard border border-white/10 text-grayText hover:text-whiteText font-bold text-xs uppercase tracking-wider flex items-center gap-2 touch-press" data-category="forros">
+                    <i class="fa-solid fa-mobile-screen text-neon text-sm"></i><span>Forros</span>
+                </button>
+                <button onclick="filterCategory('iluminacion')" id="btn-cat-iluminacion" class="category-tab snap-center shrink-0 px-4 py-3 rounded-xl bg-blackCard border border-white/10 text-grayText hover:text-whiteText font-bold text-xs uppercase tracking-wider flex items-center gap-2 touch-press" data-category="iluminacion">
+                    <i class="fa-solid fa-lightbulb text-neon text-sm"></i><span>Iluminación</span>
+                </button>
+                <button onclick="filterCategory('multiples')" id="btn-cat-multiples" class="category-tab snap-center shrink-0 px-4 py-3 rounded-xl bg-blackCard border border-white/10 text-grayText hover:text-whiteText font-bold text-xs uppercase tracking-wider flex items-center gap-2 touch-press" data-category="multiples">
+                    <i class="fa-solid fa-layer-group text-neon text-sm"></i><span>Múltiples</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Grid de Productos -->
+        <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"></div>
+
+        <!-- Estado Vacío / Cargando -->
+        <div id="empty-state" class="flex flex-col items-center justify-center py-16 text-center border border-dashed border-white/10 rounded-2xl bg-blackCard/50 reveal">
+            <i class="fa-solid fa-satellite-dish text-4xl text-neon/50 mb-3 animate-pulse"></i>
+            <h3 class="text-lg font-bold mb-1">Cargando Catálogo...</h3>
+            <p class="text-grayText text-xs" id="loading-msg">Conectando con la base de datos de GitHub.</p>
+        </div>
+    </main>
+
+    <footer class="bg-blackCard border-t border-white/10 pt-12 pb-24 md:pb-8 mt-auto relative z-10 overflow-hidden">
+        <div class="ambient-orb bottom-0 left-1/2 -translate-x-1/2"></div>
+        
+        <!-- Partículas internas exclusivas para la caja de presentación / footer -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden opacity-50">
+            <i class="fa-solid fa-bolt bg-particle text-[10px]" style="top: 20%; left: 15%; --duration: 5s; --dx: 25px; --dy: -25px;"></i>
+            <i class="fa-solid fa-shield-halved bg-particle text-[10px]" style="top: 70%; left: 85%; --duration: 6s; --dx: -30px; --dy: 30px;"></i>
+            <i class="fa-solid fa-sparkles bg-particle text-[10px]" style="top: 40%; left: 75%; --duration: 4.5s; --dx: 20px; --dy: 25px;"></i>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 flex flex-col items-center text-center relative z-10">
+            <span class="font-display font-bold text-xl uppercase mb-3">Guari<span class="neon-text">Shop</span></span>
+            <p class="text-grayText text-xs sm:text-sm mb-2"><i class="fa-solid fa-phone text-neon mr-1"></i> Atención: <span class="text-whiteText">+58 424-3006567</span></p>
+            <div class="flex gap-4 mt-2">
+                <a href="https://wa.me/584243006567" target="_blank" class="w-9 h-9 rounded-full bg-blackBg border border-white/10 flex items-center justify-center text-whiteText hover:text-neon hover:border-neon transition-colors touch-press"><i class="fa-brands fa-whatsapp"></i></a>
+                <a href="https://www.tiktok.com/@guari_shop" target="_blank" class="w-9 h-9 rounded-full bg-blackBg border border-white/10 flex items-center justify-center text-whiteText hover:text-neon hover:border-neon transition-colors touch-press"><i class="fa-brands fa-tiktok"></i></a>
+            </div>
+            
+            <!-- Recuadro inferior con fondo verdenotable (glow neón brillante y partículas) -->
+            <div class="mt-6 inline-block bg-blackBg/95 backdrop-blur-md px-7 py-3.5 rounded-2xl border-2 border-neon shadow-[0_0_30px_rgba(57,255,20,0.35)] relative overflow-hidden group hover:shadow-[0_0_40px_rgba(57,255,20,0.55)] transition-all">
+                <div class="absolute -inset-x-full top-0 h-full bg-gradient-to-r from-transparent via-neon/20 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
+                <p class="text-[11px] text-grayText uppercase tracking-wider relative z-10">Dirigida por <span class="text-whiteText font-bold">Carlos Navas</span></p>
+                <p class="text-[10px] text-neon font-black mt-1 tracking-widest uppercase relative z-10 flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-bolt text-[9px] animate-pulse text-neon"></i> Creada por DaviStudio-8
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="nosotros-modal" class="fixed inset-0 bg-black/85 z-[100] opacity-0 pointer-events-none flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="nosotros-card relative bg-blackCard border border-neon/30 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl overflow-hidden">
+            <button onclick="closeNosotros()" class="absolute top-4 right-4 text-grayText hover:text-whiteText text-xl active:scale-75 transition-transform z-20"><i class="fa-solid fa-xmark"></i></button>
+            <div class="absolute -top-20 -left-20 w-40 h-40 bg-neon/15 rounded-full blur-[40px] pointer-events-none"></div>
+            
+            <div class="w-16 h-16 mx-auto bg-blackBg border-[2px] border-neon rounded-full flex items-center justify-center mb-4 relative z-10 neon-bg-glow">
+                <i class="fa-solid fa-bolt text-neon text-3xl animate-pulse"></i>
+            </div>
+            <h2 class="font-display text-2xl font-black uppercase mb-1 relative z-10">Guari<span class="text-neon">Shop</span></h2>
+            <p class="text-whiteText text-sm mb-6 relative z-10">Ubicados en <span class="text-neon font-bold"><i class="fa-solid fa-location-dot"></i> San Juan de los Morros</span></p>
+            
+            <div class="space-y-3 relative z-10">
+                <a href="https://whatsapp.com/channel/0029Vb6lQqO1SWtA51tqWk1a" target="_blank" class="flex items-center justify-center gap-2 w-full bg-[#25D366]/10 border border-[#25D366]/30 text-whiteText py-3 rounded-xl touch-press transition-transform">
+                    <i class="fa-brands fa-whatsapp text-xl text-[#25D366]"></i><span class="font-bold text-sm">Canal de WhatsApp</span>
+                </a>
+                <a href="https://www.tiktok.com/@guari_shop" target="_blank" class="flex items-center justify-center gap-2 w-full bg-[#ff0050]/10 border border-[#ff0050]/30 text-whiteText py-3 rounded-xl touch-press transition-transform">
+                    <i class="fa-brands fa-tiktok text-xl text-white"></i><span class="font-bold text-sm">Síguenos en TikTok</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="cart-overlay" class="fixed inset-0 bg-black/70 z-50 hidden opacity-0 transition-opacity backdrop-blur-xs" onclick="toggleCart()"></div>
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full sm:w-[380px] bg-blackCard border-l border-neon/20 z-50 cart-closed flex flex-col shadow-2xl">
+        <div class="p-4 border-b border-white/10 flex justify-between items-center bg-blackBg">
+            <h2 class="font-display font-bold uppercase flex items-center gap-2 text-sm"><i class="fa-solid fa-cart-shopping text-neon"></i> Tu Carrito</h2>
+            <button onclick="toggleCart()" class="text-grayText active:scale-75 transition-transform p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        
+        <div id="cart-items" class="flex-grow overflow-y-auto p-4 space-y-3"></div>
+        
+        <!-- Sección de Método de Envío / Entrega solicitada (MRW, ZOOM, Personal) -->
+        <div class="p-4 bg-blackCard/90 border-t border-white/10">
+            <label class="block text-[11px] font-bold text-grayText uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-truck text-neon"></i> Método de Envío o Entrega:
+            </label>
+            <div class="grid grid-cols-3 gap-2 mb-3">
+                <button type="button" onclick="setDeliveryMethod('MRW')" id="btn-delivery-MRW" class="delivery-method-btn py-2.5 px-2 rounded-xl bg-neon text-blackBg font-bold text-[11px] uppercase border border-neon text-center transition-all touch-press shadow-md">
+                    MRW
+                </button>
+                <button type="button" onclick="setDeliveryMethod('ZOOM')" id="btn-delivery-ZOOM" class="delivery-method-btn py-2.5 px-2 rounded-xl bg-blackBg text-grayText hover:text-whiteText font-bold text-[11px] uppercase border border-white/10 text-center transition-all touch-press">
+                    ZOOM
+                </button>
+                <button type="button" onclick="setDeliveryMethod('Personal')" id="btn-delivery-Personal" class="delivery-method-btn py-2.5 px-2 rounded-xl bg-blackBg text-grayText hover:text-whiteText font-bold text-[10px] uppercase border border-white/10 text-center transition-all touch-press truncate" title="Entrega Personal">
+                    Personal
+                </button>
+            </div>
+            
+            <div class="flex justify-between items-center mb-3 pt-2 border-t border-white/5">
+                <span class="text-grayText text-xs font-medium">Total Estimado</span>
+                <span id="cart-total" class="font-display text-xl font-bold text-neon">$0.00</span>
+            </div>
+            
+            <button onclick="checkoutWhatsApp()" id="checkout-btn" class="w-full bg-neon text-blackBg font-bold py-3.5 rounded-xl flex justify-center items-center gap-2 text-xs uppercase tracking-wider touch-press transition-transform disabled:opacity-50 neon-bg-glow">
+                <i class="fa-brands fa-whatsapp text-base"></i> Enviar Pedido por WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-20 md:bottom-5 left-1/2 -translate-x-1/2 bg-blackBg border border-neon/50 text-white px-4 py-2 rounded-full shadow-lg z-50 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2 text-xs pointer-events-none">
+        <i class="fa-solid fa-check text-neon"></i><span id="toast-msg" class="font-semibold">Agregado</span>
+    </div>
+
+    <script>
+        const GITHUB_USER = "davipcgt-netizen"; 
+        const GITHUB_REPO = "TrendyShop"; 
+        const FILE_PATH = "guarishop_bd.json"; 
+        const waNumber = "584243006567";
+        
+        let activeProducts = [];
+        let cart = [];
+        let currentCategory = 'todos';
+        let selectedDelivery = 'MRW'; // por defecto
+
+        const grid = document.getElementById('product-grid');
+        const emptyState = document.getElementById('empty-state');
+        const dynamicText = document.getElementById('dynamic-text');
+
+        // Rotación de Texto Hero
+        const words = ["Accesorios", "Setup", "Estilo", "Día a Día"];
+        let wordIndex = 0;
+        setInterval(() => {
+            dynamicText.style.opacity = '0';
+            setTimeout(() => {
+                wordIndex = (wordIndex + 1) % words.length;
+                dynamicText.textContent = words[wordIndex];
+                dynamicText.style.opacity = '1';
+            }, 300);
+        }, 3000);
+        dynamicText.style.transition = 'opacity 0.3s ease';
+
+        function initObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        // Cargar desde GitHub (Nube) sin modificar keys ni rutas
+        async function fetchProducts() {
+            const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
+            try {
+                const response = await fetch(url);
+                if (response.status === 404) {
+                    document.getElementById('loading-msg').innerText = "Aún no hay productos publicados.";
+                    document.getElementById('empty-state').querySelector('i').className = "fa-solid fa-ghost text-4xl text-white/20 mb-3 animate-pulse";
+                    return;
+                }
+                const result = await response.json();
+                const decodedText = decodeURIComponent(escape(window.atob(result.content.replace(/\s/g, ''))));
+                activeProducts = JSON.parse(decodedText);
+                
+                document.getElementById('badge-total-count').textContent = activeProducts.length;
+                renderProducts('todos');
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById('loading-msg').innerText = "Error cargando catálogo.";
+            }
+        }
+
+        function renderProducts(category = 'todos') {
+            currentCategory = category;
+            grid.innerHTML = '';
+            
+            let filtered = activeProducts;
+            if (category !== 'todos') {
+                filtered = activeProducts.filter(p => p.category && p.category.toLowerCase().trim() === category.toLowerCase().trim());
+            }
+
+            if(filtered.length === 0) {
+                 grid.innerHTML = '';
+                 emptyState.classList.remove('hidden');
+                 document.getElementById('loading-msg').innerText = category === 'todos' ? "Catálogo vacío." : "No hay productos en esta categoría.";
+                 return;
+            }
+            emptyState.classList.add('hidden');
+
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "bg-blackCard border border-white/5 rounded-xl overflow-hidden flex flex-col relative shadow-md reveal active group hover:border-neon/40 transition-colors";
+                
+                let imageHtml = p.img 
+                    ? `<img src="${p.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                       <div class="hidden absolute inset-0 items-center justify-center text-white/10"><i class="fa-solid fa-box text-4xl"></i></div>`
+                    : `<div class="absolute inset-0 flex items-center justify-center text-white/10"><i class="fa-solid fa-box text-4xl"></i></div>`;
+
+                card.innerHTML = `
+                    <button onclick="toggleLike(this, event)" class="absolute top-2.5 left-2.5 z-20 text-white/20 hover:text-white/60 transition-colors text-lg p-2 rounded-full bg-black/50 backdrop-blur-sm touch-press"><i class="fa-solid fa-heart"></i></button>
+                    <div class="h-36 sm:h-44 bg-blackBg border-b border-white/5 relative overflow-hidden">
+                        ${imageHtml}
+                        <div class="absolute inset-0 bg-gradient-to-t from-blackBg to-transparent opacity-40 group-hover:opacity-20 transition-opacity"></div>
+                        <span class="absolute top-2.5 right-2.5 text-[8px] sm:text-[9px] uppercase font-bold bg-black/70 backdrop-blur-sm text-whiteText px-2 py-0.5 rounded border border-white/10 shadow-md">${p.category || 'General'}</span>
+                    </div>
+                    <div class="p-3 sm:p-4 flex flex-col flex-grow">
+                        <h3 class="font-bold text-xs sm:text-sm mb-1.5 truncate group-hover:text-neon transition-colors">${p.name}</h3>
+                        <p class="text-neon font-display font-bold text-lg mb-3">$${parseFloat(p.price).toFixed(2)}</p>
+                        <button onclick="addToCart('${p.id}', this, event)" class="mt-auto w-full bg-blackBg border border-white/10 hover:border-neon hover:text-blackBg hover:bg-neon text-whiteText text-xs font-bold py-2.5 rounded-lg touch-press transition-all flex items-center justify-center gap-1.5 uppercase relative overflow-hidden shadow-sm">
+                            <span class="relative z-10 flex items-center gap-1.5"><i class="fa-solid fa-cart-plus"></i> Añadir</span>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function createParticles(x, y, color, icon) {
+            for(let i=0; i<6; i++){
+                let s = document.createElement('i');
+                s.className = `fa-solid ${icon} spark`;
+                s.style.color = color;
+                s.style.left = x + 'px'; s.style.top = y + 'px';
+                s.style.setProperty('--tx', (Math.random() - 0.5)*120 + 'px');
+                s.style.setProperty('--ty', (Math.random() - 1.2)*120 + 'px');
+                document.body.appendChild(s);
+                setTimeout(() => s.remove(), 450);
+            }
+        }
+
+        function toggleLike(btn, e) {
+            e.stopPropagation();
+            const icon = btn.querySelector('i');
+            icon.classList.toggle('liked');
+            if(icon.classList.contains('liked')) {
+                createParticles(e.clientX, e.clientY, '#ff2a2a', 'fa-heart');
+            }
+        }
+
+        function filterCategory(cat) {
+            const categories = ['todos', 'adifonos', 'cargadores', 'forros', 'iluminacion', 'multiples'];
+            
+            categories.forEach(c => {
+                const btn = document.getElementById(`btn-cat-${c}`);
+                if (!btn) return;
+                
+                if (c === cat) {
+                    btn.className = "category-tab snap-center shrink-0 px-5 py-3 rounded-2xl bg-neon text-blackBg font-display font-black text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2 neon-bg-glow touch-press shadow-lg border border-neon";
+                    const icon = btn.querySelector('i');
+                    if(icon) icon.className = icon.className.replace('text-neon', 'text-blackBg');
+                } else {
+                    btn.className = "category-tab snap-center shrink-0 px-4 py-3 rounded-xl bg-blackCard border border-white/10 text-grayText hover:text-whiteText font-bold text-xs uppercase tracking-wider flex items-center gap-2 touch-press";
+                    const icon = btn.querySelector('i');
+                    if(icon && icon.classList.contains('text-blackBg')) {
+                        icon.className = icon.className.replace('text-blackBg', 'text-neon');
+                    }
+                }
+            });
+
+            renderProducts(cat);
+        }
+
+        function setDeliveryMethod(method) {
+            selectedDelivery = method;
+            const methods = ['MRW', 'ZOOM', 'Personal'];
+            methods.forEach(m => {
+                const btn = document.getElementById(`btn-delivery-${m}`);
+                if(!btn) return;
+                if(m === method) {
+                    btn.className = "delivery-method-btn py-2.5 px-2 rounded-xl bg-neon text-blackBg font-bold text-[11px] uppercase border border-neon text-center transition-all touch-press shadow-md";
+                } else {
+                    btn.className = "delivery-method-btn py-2.5 px-2 rounded-xl bg-blackBg text-grayText hover:text-whiteText font-bold text-[11px] uppercase border border-white/10 text-center transition-all touch-press";
+                }
+            });
+            showToast(`Método: ${method}`);
+        }
+
+        function openNosotros(e) { 
+            e.preventDefault(); 
+            document.getElementById('nosotros-modal').classList.add('nosotros-open'); 
+            createParticles(window.innerWidth/2, window.innerHeight/2, '#39ff14', 'fa-bolt');
+        }
+        function closeNosotros() { document.getElementById('nosotros-modal').classList.remove('nosotros-open'); }
+        document.getElementById('nosotros-modal').addEventListener('click', (e) => { if(e.target.id === 'nosotros-modal') closeNosotros(); });
+
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            if (sidebar.classList.contains('cart-open')) {
+                sidebar.classList.replace('cart-open', 'cart-closed');
+                overlay.classList.replace('opacity-100', 'opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            } else {
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.classList.replace('opacity-0', 'opacity-100');
+                    sidebar.classList.replace('cart-closed', 'cart-open');
+                }, 10);
+            }
+        }
+
+        function addToCart(id, btn, e) {
+            const prod = activeProducts.find(p => p.id === id);
+            const exist = cart.find(i => i.id === id);
+            if(exist) exist.qty++; else cart.push({...prod, qty: 1});
+            
+            createParticles(e.clientX, e.clientY, '#39ff14', 'fa-bolt');
+            showToast(`${prod.name} añadido`);
+            
+            const ogHtml = btn.innerHTML;
+            btn.classList.add('bg-neon', 'text-blackBg');
+            btn.innerHTML = `<span class="relative z-10 flex items-center gap-1.5"><i class="fa-solid fa-check"></i> Listo</span>`;
+            
+            const cCount = document.getElementById('cart-count');
+            cCount.classList.add('scale-150'); setTimeout(() => cCount.classList.remove('scale-150'), 300);
+
+            setTimeout(() => { 
+                btn.innerHTML = ogHtml; 
+                btn.classList.remove('bg-neon', 'text-blackBg'); 
+            }, 1000);
+            
+            updateCartUI();
+        }
+
+        function updateQty(id, change) {
+            const item = cart.find(i => i.id === id);
+            if(item) { item.qty += change; if(item.qty <= 0) cart = cart.filter(i => i.id !== id); updateCartUI(); }
+        }
+
+        function updateCartUI() {
+            const count = cart.reduce((s, i) => s + i.qty, 0);
+            document.getElementById('cart-count').textContent = count;
+            document.getElementById('mobile-cart-count').textContent = count;
+            
+            const container = document.getElementById('cart-items');
+            container.innerHTML = '';
+            let total = 0;
+
+            if(cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-grayText text-xs mt-10"><i class="fa-solid fa-basket-shopping text-2xl mb-2 opacity-50 block"></i>Vacío</div>`;
+                document.getElementById('checkout-btn').disabled = true;
+            } else {
+                document.getElementById('checkout-btn').disabled = false;
+                cart.forEach(item => {
+                    total += (item.price * item.qty);
+                    container.innerHTML += `
+                        <div class="flex items-center gap-3 bg-blackBg p-3 rounded-xl border border-white/5">
+                            <img src="${item.img}" class="w-10 h-10 object-cover rounded bg-blackCard" onerror="this.style.display='none'">
+                            <div class="flex-grow">
+                                <h4 class="text-[11px] font-bold truncate w-28 sm:w-36">${item.name}</h4>
+                                <p class="text-neon text-[10px] font-bold">$${parseFloat(item.price).toFixed(2)}</p>
+                            </div>
+                            <div class="flex items-center bg-blackCard rounded-lg border border-white/10 text-[10px] overflow-hidden">
+                                <button onclick="updateQty('${item.id}', -1)" class="w-6 h-6 hover:bg-white/10 transition-colors">-</button>
+                                <span class="w-5 text-center font-bold">${item.qty}</span>
+                                <button onclick="updateQty('${item.id}', 1)" class="w-6 h-6 text-neon hover:bg-neon/10 transition-colors">+</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            t.classList.replace('translate-y-20', 'translate-y-0'); t.classList.replace('opacity-0', 'opacity-100');
+            setTimeout(() => { t.classList.replace('translate-y-0', 'translate-y-20'); t.classList.replace('opacity-100', 'opacity-0'); }, 2000);
+        }
+
+        function checkoutWhatsApp() {
+            if(cart.length === 0) return;
+            let msg = `Hola *GuariShop* ⚡, quiero realizar el siguiente pedido:\n\n`; 
+            let total = 0;
+            
+            cart.forEach(i => { 
+                let t = i.price * i.qty; 
+                total += t; 
+                msg += `▪ ${i.qty}x ${i.name} - $${t.toFixed(2)}\n`; 
+            });
+            
+            msg += `\n*Total: $${total.toFixed(2)}*`;
+            msg += `\n📦 *Método de Envío/Entrega:* ${selectedDelivery}`;
+            
+            window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { initObserver(); fetchProducts(); });
+    </script>
+</body>
+</html>

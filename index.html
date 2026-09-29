@@ -209,8 +209,8 @@
                     <i class="fa-solid fa-border-all text-sm"></i><span>Todos</span>
                     <span id="badge-total-count" class="bg-blackBg text-neon text-[10px] px-2 py-0.5 rounded-full font-bold ml-0.5">0</span>
                 </button>
-                <button onclick="filterCategory('adifonos')" id="btn-cat-adifonos" class="category-tab snap-center shrink-0 px-4 py-3 rounded-xl bg-blackCard border border-white/10 text-grayText hover:text-whiteText font-bold text-xs uppercase tracking-wider flex items-center gap-2 touch-press" data-category="adifonos">
-                    <i class="fa-solid fa-headphones text-neon text-sm"></i><span>Audifonos</span>
+                <button onclick="filterCategory('audifonos')" id="btn-cat-audifonos" class="category-tab snap-center shrink-0 px-4 py-3 rounded-xl bg-blackCard border border-white/10 text-grayText hover:text-whiteText font-bold text-xs uppercase tracking-wider flex items-center gap-2 touch-press" data-category="audifonos">
+                    <i class="fa-solid fa-headphones text-neon text-sm"></i><span>Audífonos</span>
                 </button>
                 <button onclick="filterCategory('cargadores')" id="btn-cat-cargadores" class="category-tab snap-center shrink-0 px-4 py-3 rounded-xl bg-blackCard border border-white/10 text-grayText hover:text-whiteText font-bold text-xs uppercase tracking-wider flex items-center gap-2 touch-press" data-category="cargadores">
                     <i class="fa-solid fa-plug text-neon text-sm"></i><span>Cargadores</span>
@@ -241,7 +241,6 @@
     <footer class="bg-blackCard border-t border-white/10 pt-12 pb-24 md:pb-8 mt-auto relative z-10 overflow-hidden">
         <div class="ambient-orb bottom-0 left-1/2 -translate-x-1/2"></div>
         
-        <!-- Partículas internas exclusivas para la caja de presentación / footer -->
         <div class="absolute inset-0 pointer-events-none overflow-hidden opacity-50">
             <i class="fa-solid fa-bolt bg-particle text-[10px]" style="top: 20%; left: 15%; --duration: 5s; --dx: 25px; --dy: -25px;"></i>
             <i class="fa-solid fa-shield-halved bg-particle text-[10px]" style="top: 70%; left: 85%; --duration: 6s; --dx: -30px; --dy: 30px;"></i>
@@ -256,7 +255,6 @@
                 <a href="https://www.tiktok.com/@guari_shop" target="_blank" class="w-9 h-9 rounded-full bg-blackBg border border-white/10 flex items-center justify-center text-whiteText hover:text-neon hover:border-neon transition-colors touch-press"><i class="fa-brands fa-tiktok"></i></a>
             </div>
             
-            <!-- Recuadro inferior con fondo verdenotable (glow neón brillante y partículas) -->
             <div class="mt-6 inline-block bg-blackBg/95 backdrop-blur-md px-7 py-3.5 rounded-2xl border-2 border-neon shadow-[0_0_30px_rgba(57,255,20,0.35)] relative overflow-hidden group hover:shadow-[0_0_40px_rgba(57,255,20,0.55)] transition-all">
                 <div class="absolute -inset-x-full top-0 h-full bg-gradient-to-r from-transparent via-neon/20 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
                 <p class="text-[11px] text-grayText uppercase tracking-wider relative z-10">Dirigida por <span class="text-whiteText font-bold">Carlos Navas</span></p>
@@ -298,7 +296,6 @@
         
         <div id="cart-items" class="flex-grow overflow-y-auto p-4 space-y-3"></div>
         
-        <!-- Sección de Método de Envío / Entrega solicitada (MRW, ZOOM, Personal) -->
         <div class="p-4 bg-blackCard/90 border-t border-white/10">
             <label class="block text-[11px] font-bold text-grayText uppercase tracking-wider mb-2 flex items-center gap-1.5">
                 <i class="fa-solid fa-truck text-neon"></i> Método de Envío o Entrega:
@@ -339,13 +336,23 @@
         let activeProducts = [];
         let cart = [];
         let currentCategory = 'todos';
-        let selectedDelivery = 'MRW'; // por defecto
+        let selectedDelivery = 'MRW';
 
         const grid = document.getElementById('product-grid');
         const emptyState = document.getElementById('empty-state');
         const dynamicText = document.getElementById('dynamic-text');
 
-        // Rotación de Texto Hero
+        // Función para normalizar categorías y corregir variaciones al vuelo ("adifonos", "aidifonos", etc.)
+        function normalizeCategory(cat) {
+            if (!cat) return 'General';
+            let clean = cat.toLowerCase().trim();
+            if (clean === 'adifonos' || clean === 'aidifonos' || clean === 'audifonos' || clean === 'audífonos') {
+                return 'Audífonos';
+            }
+            // Capitaliza primera letra para otras categorías
+            return clean.charAt(0).toUpperCase() + clean.slice(1);
+        }
+
         const words = ["Accesorios", "Setup", "Estilo", "Día a Día"];
         let wordIndex = 0;
         setInterval(() => {
@@ -365,7 +372,6 @@
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         }
 
-        // Cargar desde GitHub (Nube) sin modificar keys ni rutas
         async function fetchProducts() {
             const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
             try {
@@ -393,7 +399,14 @@
             
             let filtered = activeProducts;
             if (category !== 'todos') {
-                filtered = activeProducts.filter(p => p.category && p.category.toLowerCase().trim() === category.toLowerCase().trim());
+                filtered = activeProducts.filter(p => {
+                    let normalizedCat = normalizeCategory(p.category).toLowerCase();
+                    let targetCat = category.toLowerCase();
+                    if (targetCat === 'audifonos') {
+                        return normalizedCat === 'audífonos';
+                    }
+                    return normalizedCat === targetCat;
+                });
             }
 
             if(filtered.length === 0) {
@@ -413,12 +426,14 @@
                        <div class="hidden absolute inset-0 items-center justify-center text-white/10"><i class="fa-solid fa-box text-4xl"></i></div>`
                     : `<div class="absolute inset-0 flex items-center justify-center text-white/10"><i class="fa-solid fa-box text-4xl"></i></div>`;
 
+                let displayCategory = normalizeCategory(p.category);
+
                 card.innerHTML = `
                     <button onclick="toggleLike(this, event)" class="absolute top-2.5 left-2.5 z-20 text-white/20 hover:text-white/60 transition-colors text-lg p-2 rounded-full bg-black/50 backdrop-blur-sm touch-press"><i class="fa-solid fa-heart"></i></button>
                     <div class="h-36 sm:h-44 bg-blackBg border-b border-white/5 relative overflow-hidden">
                         ${imageHtml}
                         <div class="absolute inset-0 bg-gradient-to-t from-blackBg to-transparent opacity-40 group-hover:opacity-20 transition-opacity"></div>
-                        <span class="absolute top-2.5 right-2.5 text-[8px] sm:text-[9px] uppercase font-bold bg-black/70 backdrop-blur-sm text-whiteText px-2 py-0.5 rounded border border-white/10 shadow-md">${p.category || 'General'}</span>
+                        <span class="absolute top-2.5 right-2.5 text-[8px] sm:text-[9px] uppercase font-bold bg-black/70 backdrop-blur-sm text-whiteText px-2 py-0.5 rounded border border-white/10 shadow-md">${displayCategory}</span>
                     </div>
                     <div class="p-3 sm:p-4 flex flex-col flex-grow">
                         <h3 class="font-bold text-xs sm:text-sm mb-1.5 truncate group-hover:text-neon transition-colors">${p.name}</h3>
@@ -455,7 +470,7 @@
         }
 
         function filterCategory(cat) {
-            const categories = ['todos', 'adifonos', 'cargadores', 'forros', 'iluminacion', 'multiples'];
+            const categories = ['todos', 'audifonos', 'cargadores', 'forros', 'iluminacion', 'multiples'];
             
             categories.forEach(c => {
                 const btn = document.getElementById(`btn-cat-${c}`);

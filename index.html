@@ -6,6 +6,8 @@
     <title>GuariShop | Tecnología y Accesorios</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SDK Oficial de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -200,7 +202,7 @@
         <div class="ambient-orb top-20 right-10"></div>
         <div class="text-center mb-8 reveal">
             <h2 class="font-display text-2xl sm:text-4xl font-bold uppercase mb-1">Nuestro <span class="text-neon">Catálogo</span></h2>
-            <p class="text-grayText text-xs sm:text-sm">Sincronizado directo desde la nube</p>
+            <p class="text-grayText text-xs sm:text-sm">Sincronizado en tiempo real con la nube</p>
         </div>
 
         <div class="mb-10 reveal">
@@ -234,7 +236,7 @@
         <div id="empty-state" class="flex flex-col items-center justify-center py-16 text-center border border-dashed border-white/10 rounded-2xl bg-blackCard/50 reveal">
             <i class="fa-solid fa-satellite-dish text-4xl text-neon/50 mb-3 animate-pulse"></i>
             <h3 class="text-lg font-bold mb-1">Cargando Catálogo...</h3>
-            <p class="text-grayText text-xs" id="loading-msg">Conectando con la base de datos de GitHub.</p>
+            <p class="text-grayText text-xs" id="loading-msg">Conectando con la base de datos de Supabase.</p>
         </div>
     </main>
 
@@ -328,9 +330,13 @@
     </div>
 
     <script>
-        const GITHUB_USER = "davipcgt-netizen"; 
-        const GITHUB_REPO = "TrendyShop"; 
-        const FILE_PATH = "guarishop_bd.json"; 
+        // =========================================================
+        // ⚡ CONEXIÓN DIRECTA A SUPABASE (GUARISHOP)
+        // =========================================================
+        const SUPABASE_URL = "https://jouqjbutkvqqvqgmzlux.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvdXFqYnV0a3ZxcXZxZ216bHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2MDM0OTYsImV4cCI6MjEwODE3OTQ5Nn0.MH8aHBdnsR99EFTf92OzXVi3oKNBKpuqjq5SYSAzsFI";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         const waNumber = "584243006567";
         
         let activeProducts = [];
@@ -342,14 +348,13 @@
         const emptyState = document.getElementById('empty-state');
         const dynamicText = document.getElementById('dynamic-text');
 
-        // Función para normalizar categorías y corregir variaciones al vuelo ("adifonos", "aidifonos", etc.)
+        // Función para normalizar categorías y corregir variaciones al vuelo
         function normalizeCategory(cat) {
             if (!cat) return 'General';
             let clean = cat.toLowerCase().trim();
             if (clean === 'adifonos' || clean === 'aidifonos' || clean === 'audifonos' || clean === 'audífonos') {
                 return 'Audífonos';
             }
-            // Capitaliza primera letra para otras categorías
             return clean.charAt(0).toUpperCase() + clean.slice(1);
         }
 
@@ -373,19 +378,23 @@
         }
 
         async function fetchProducts() {
-            const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
             try {
-                const response = await fetch(url);
-                if (response.status === 404) {
+                const { data, error } = await supabaseClient
+                    .from('guarishop_productos')
+                    .select('*')
+                    .order('id', { ascending: false });
+
+                if (error) throw error;
+
+                activeProducts = data || [];
+                document.getElementById('badge-total-count').textContent = activeProducts.length;
+
+                if (activeProducts.length === 0) {
                     document.getElementById('loading-msg').innerText = "Aún no hay productos publicados.";
                     document.getElementById('empty-state').querySelector('i').className = "fa-solid fa-ghost text-4xl text-white/20 mb-3 animate-pulse";
                     return;
                 }
-                const result = await response.json();
-                const decodedText = decodeURIComponent(escape(window.atob(result.content.replace(/\s/g, ''))));
-                activeProducts = JSON.parse(decodedText);
-                
-                document.getElementById('badge-total-count').textContent = activeProducts.length;
+
                 renderProducts('todos');
             } catch (error) {
                 console.error("Error:", error);
@@ -532,8 +541,9 @@
         }
 
         function addToCart(id, btn, e) {
-            const prod = activeProducts.find(p => p.id === id);
-            const exist = cart.find(i => i.id === id);
+            const prod = activeProducts.find(p => String(p.id) === String(id));
+            if (!prod) return;
+            const exist = cart.find(i => String(i.id) === String(id));
             if(exist) exist.qty++; else cart.push({...prod, qty: 1});
             
             createParticles(e.clientX, e.clientY, '#39ff14', 'fa-bolt');
@@ -555,8 +565,8 @@
         }
 
         function updateQty(id, change) {
-            const item = cart.find(i => i.id === id);
-            if(item) { item.qty += change; if(item.qty <= 0) cart = cart.filter(i => i.id !== id); updateCartUI(); }
+            const item = cart.find(i => String(i.id) === String(id));
+            if(item) { item.qty += change; if(item.qty <= 0) cart = cart.filter(i => String(i.id) !== String(id)); updateCartUI(); }
         }
 
         function updateCartUI() {

@@ -40,12 +40,10 @@
         .neon-text { color: #39ff14; text-shadow: 0 0 14px rgba(57, 255, 20, 0.75); }
         .neon-bg-glow { box-shadow: 0 0 25px rgba(57, 255, 20, 0.35); }
         
-        /* Marquesina fluida ultra suave */
         @keyframes marquee { 0% { transform: translate3d(100%, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
         .animate-marquee { display: inline-block; white-space: nowrap; animation: marquee 18s linear infinite; will-change: transform; }
         @media (min-width: 640px) { .sm\:animate-none { animation: none; transform: none; } }
 
-        /* Partículas flotantes ligeras optimizadas por GPU (cero lag en Android) */
         @keyframes ambient-float {
             0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.9); opacity: 0.12; }
             50% { transform: translate3d(var(--dx), var(--dy), 0) rotate(180deg) scale(1.1); opacity: 0.35; }
@@ -60,7 +58,6 @@
             will-change: transform, opacity;
         }
 
-        /* Orbes de luz ambiental parpadeantes de fondo */
         @keyframes pulse-glow {
             0%, 100% { opacity: 0.15; filter: blur(50px); }
             50% { opacity: 0.35; filter: blur(70px); }
@@ -113,10 +110,18 @@
         .cart-open { transform: translateX(0) !important; }
         .cart-closed { transform: translateX(100%); }
 
-        #nosotros-modal { transition: opacity 0.3s ease; }
-        .nosotros-open { opacity: 1 !important; pointer-events: auto !important; }
-        .nosotros-card { transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .nosotros-open .nosotros-card { transform: scale(1); }
+        #nosotros-modal, #preview-modal, #guaribot-modal { transition: opacity 0.3s ease; }
+        .nosotros-open, .preview-open, .guaribot-open { opacity: 1 !important; pointer-events: auto !important; }
+        .nosotros-card, .preview-card, .guaribot-card { transform: scale(0.85); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .nosotros-open .nosotros-card, .preview-open .preview-card, .guaribot-open .guaribot-card { transform: scale(1); }
+
+        @keyframes typing-bounce {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-6px); opacity: 1; }
+        }
+        .typing-dot-1 { animation: typing-bounce 1.4s infinite ease-in-out; }
+        .typing-dot-2 { animation: typing-bounce 1.4s infinite ease-in-out 0.2s; }
+        .typing-dot-3 { animation: typing-bounce 1.4s infinite ease-in-out 0.4s; }
     </style>
 </head>
 <body class="font-sans antialiased flex flex-col min-h-screen pb-20 md:pb-0 relative z-10">
@@ -148,14 +153,25 @@
                 </div>
                 <span class="font-display font-bold text-xl tracking-wide uppercase">Guari<span class="neon-text">Shop</span></span>
             </a>
-            <nav class="hidden md:flex space-x-6">
+            <nav class="hidden md:flex space-x-6 items-center">
                 <a href="#catalogo" class="text-whiteText hover:text-neon transition-colors font-medium text-sm uppercase tracking-wider">Catálogo</a>
                 <a href="#" onclick="openNosotros(event)" class="text-whiteText hover:text-neon transition-colors font-medium text-sm uppercase tracking-wider">Nosotros</a>
             </nav>
-            <button onclick="toggleCart()" class="relative p-2.5 bg-blackCard border border-white/10 hover:border-neon text-whiteText hover:text-neon transition-all hidden md:flex items-center justify-center rounded-xl active:scale-95 shadow-md">
-                <i class="fa-solid fa-cart-shopping text-lg"></i>
-                <span id="cart-count" class="absolute -top-1.5 -right-1.5 bg-neon text-blackBg text-[10px] font-black px-1.5 py-0.2 rounded-full neon-bg-glow transition-transform duration-300">0</span>
-            </button>
+            <div class="flex items-center gap-3">
+                <!-- Botón superior derecho de Guaribot AI -->
+                <button onclick="openGuaribot()" class="relative p-2.5 bg-blackCard border border-neon/60 hover:border-neon text-neon transition-all flex items-center justify-center rounded-xl active:scale-95 shadow-[0_0_15px_rgba(57,255,20,0.3)] group touch-press" title="Abrir Guaribot AI">
+                    <i class="fa-solid fa-robot text-lg group-hover:scale-110 transition-transform"></i>
+                    <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-neon"></span>
+                    </span>
+                </button>
+
+                <button onclick="toggleCart()" class="relative p-2.5 bg-blackCard border border-white/10 hover:border-neon text-whiteText hover:text-neon transition-all flex items-center justify-center rounded-xl active:scale-95 shadow-md">
+                    <i class="fa-solid fa-cart-shopping text-lg"></i>
+                    <span id="cart-count" class="absolute -top-1.5 -right-1.5 bg-neon text-blackBg text-[10px] font-black px-1.5 py-0.2 rounded-full neon-bg-glow transition-transform duration-300">0</span>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -166,11 +182,27 @@
         <a href="#catalogo" class="flex flex-col items-center gap-1 text-grayText hover:text-whiteText active:scale-90 transition-transform touch-press">
             <i class="fa-solid fa-compass text-lg"></i><span class="text-[9px] font-bold uppercase tracking-wider">Catálogo</span>
         </a>
+        <button onclick="openGuaribot()" class="flex flex-col items-center gap-1 text-neon active:scale-90 transition-transform touch-press">
+            <i class="fa-solid fa-robot text-lg animate-pulse"></i><span class="text-[9px] font-bold uppercase tracking-wider">Guaribot</span>
+        </button>
         <button onclick="toggleCart()" class="flex flex-col items-center gap-1 text-grayText hover:text-whiteText relative active:scale-90 transition-transform touch-press">
             <i class="fa-solid fa-cart-shopping text-lg"></i><span class="text-[9px] font-bold uppercase tracking-wider">Carrito</span>
             <span id="mobile-cart-count" class="absolute -top-1 -right-2 bg-neon text-blackBg text-[9px] font-black px-1.5 rounded-full">0</span>
         </button>
     </nav>
+
+    <!-- 🤖 BOTÓN FLOTANTE INFERIOR DERECHO (GUARIBOT AI) -->
+    <div class="fixed bottom-20 md:bottom-6 right-5 z-40">
+        <button onclick="openGuaribot()" class="bg-blackCard border-2 border-neon hover:bg-neon hover:text-blackBg text-neon font-display font-bold px-4 py-3 rounded-2xl shadow-[0_0_25px_rgba(57,255,20,0.4)] flex items-center gap-2.5 transition-all duration-300 group touch-press">
+            <div class="w-8 h-8 rounded-full bg-neon text-blackBg group-hover:bg-blackBg group-hover:text-neon flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-robot text-sm animate-pulse"></i>
+            </div>
+            <div class="text-left">
+                <span class="block text-[10px] text-grayText group-hover:text-blackBg/70 uppercase font-semibold">Asistente Virtual</span>
+                <span class="block text-xs font-black tracking-wide">Guaribot AI</span>
+            </div>
+        </button>
+    </div>
 
     <section class="relative pt-12 pb-20 overflow-hidden">
         <div class="ambient-orb top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
@@ -202,7 +234,7 @@
         <div class="ambient-orb top-20 right-10"></div>
         <div class="text-center mb-8 reveal">
             <h2 class="font-display text-2xl sm:text-4xl font-bold uppercase mb-1">Nuestro <span class="text-neon">Catálogo</span></h2>
-            <p class="text-grayText text-xs sm:text-sm">Sincronizado en tiempo real con la nube</p>
+            <p class="text-grayText text-xs sm:text-sm">Toca cualquier producto para verlo en detalle</p>
         </div>
 
         <div class="mb-10 reveal">
@@ -267,6 +299,114 @@
         </div>
     </footer>
 
+    <!-- MODAL DE GUARIBOT AI (CON BOTÓN DE REINICIAR/LIMPIAR CHAT) -->
+    <div id="guaribot-modal" class="fixed inset-0 bg-black/85 z-[120] opacity-0 pointer-events-none flex items-center justify-center p-3 sm:p-4 backdrop-blur-md">
+        <div class="guaribot-card relative bg-blackCard border-2 border-neon/60 rounded-3xl max-w-lg w-full h-[88vh] sm:h-[620px] shadow-[0_0_60px_rgba(57,255,20,0.3)] flex flex-col overflow-hidden">
+            
+            <!-- Header del Chatbot -->
+            <div class="p-4 bg-gradient-to-r from-blackBg via-blackCard to-blackBg border-b border-neon/30 flex justify-between items-center shadow-md">
+                <div class="flex items-center gap-3">
+                    <div class="relative">
+                        <div class="w-11 h-11 bg-blackBg border-2 border-neon rounded-2xl flex items-center justify-center neon-bg-glow">
+                            <i class="fa-solid fa-robot text-neon text-xl animate-pulse"></i>
+                        </div>
+                        <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-blackBg rounded-full"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-display font-black text-sm sm:text-base uppercase tracking-wide text-whiteText">Guaribot <span class="neon-text">AI</span></h3>
+                            <span class="bg-neon/10 text-neon text-[9px] font-black px-2 py-0.5 rounded-full border border-neon/30">PRO</span>
+                        </div>
+                        <p class="text-[11px] text-emerald-400 font-medium flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> En línea para ayudarte
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <!-- Botón para reiniciar/limpiar chat -->
+                    <button onclick="resetChat()" class="w-9 h-9 rounded-full bg-black/80 border border-white/10 text-grayText hover:text-neon hover:border-neon flex items-center justify-center text-sm active:scale-75 transition-all shadow-md" title="Reiniciar chat">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                    <!-- Botón cerrar -->
+                    <button onclick="closeGuaribot()" class="w-9 h-9 rounded-full bg-black/80 border border-white/10 text-whiteText hover:text-neon hover:border-neon flex items-center justify-center text-lg active:scale-75 transition-all shadow-md" title="Cerrar">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cuerpo del Chat -->
+            <div id="chatbot-messages" class="flex-grow overflow-y-auto p-4 space-y-4 text-xs sm:text-sm bg-[#07090c]">
+                <!-- Saludo inicial del bot -->
+                <div class="flex items-start gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-neon/15 border border-neon/40 flex items-center justify-center text-neon shrink-0 shadow-sm">
+                        <i class="fa-solid fa-robot text-xs"></i>
+                    </div>
+                    <div class="bg-blackCard border border-white/10 rounded-2xl rounded-tl-none p-4 text-whiteText max-w-[85%] shadow-lg leading-relaxed">
+                        <p class="font-semibold text-neon mb-1">¡Hola, bienvenido a GuariShop! ⚡</p>
+                        Soy <strong class="text-whiteText">Guaribot AI</strong>. Puedo mostrarte audífonos, cargadores, forros, AirPods, ubicación o cualquier artículo al instante. ¿Qué buscamos hoy?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input de Texto -->
+            <div class="p-3.5 sm:p-4 bg-blackBg border-t border-neon/20 shadow-inner">
+                <form onsubmit="handleChatSubmit(event)" class="flex gap-2.5 items-center">
+                    <div class="relative flex-grow">
+                        <input type="text" id="chatbot-input" placeholder="Pregunta por un producto, ubicación, etc..." class="w-full bg-blackCard border border-white/15 focus:border-neon rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-whiteText outline-none transition-colors shadow-inner pr-10">
+                        <i class="fa-solid fa-sparkles text-neon/40 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    </div>
+                    <button type="submit" class="bg-neon hover:bg-neonHover text-blackBg w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm neon-bg-glow active:scale-95 transition-all shrink-0">
+                        <i class="fa-solid fa-paper-plane text-base"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Vista Previa del Producto -->
+    <div id="preview-modal" class="fixed inset-0 bg-black/85 z-[105] opacity-0 pointer-events-none flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="preview-card relative bg-blackCard border border-neon/40 rounded-3xl max-w-md w-full shadow-[0_0_40px_rgba(57,255,20,0.2)] overflow-hidden">
+            <button onclick="closeProductPreview()" class="absolute top-3.5 right-3.5 w-9 h-9 rounded-full bg-black/70 border border-white/10 text-whiteText hover:text-neon hover:border-neon flex items-center justify-center text-lg active:scale-75 transition-all z-30 backdrop-blur-md">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="relative h-72 sm:h-80 bg-blackBg border-b border-white/10 flex items-center justify-center overflow-hidden">
+                <img id="preview-img" src="" alt="Vista previa" class="w-full h-full object-contain p-2 transition-transform duration-500">
+                <div id="preview-no-img" class="hidden absolute inset-0 items-center justify-center text-white/10">
+                    <i class="fa-solid fa-box text-6xl"></i>
+                </div>
+                <span id="preview-category" class="absolute bottom-3 left-3 text-[10px] uppercase font-black bg-black/80 backdrop-blur-md text-neon px-3 py-1 rounded-full border border-neon/40 shadow-md">Categoría</span>
+            </div>
+
+            <div class="p-5 sm:p-6">
+                <h3 id="preview-title" class="font-display font-bold text-lg sm:text-xl text-whiteText mb-2 leading-snug">Nombre del Producto</h3>
+                
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <span class="text-[10px] text-grayText uppercase tracking-wider block">Precio Exclusivo</span>
+                        <span id="preview-price" class="font-display font-black text-2xl sm:text-3xl text-neon">$0.00</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-flex items-center gap-1.5 text-[11px] text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg">
+                            <i class="fa-solid fa-circle-check text-[10px]"></i> Disponible
+                        </span>
+                    </div>
+                </div>
+
+                <div class="bg-blackBg/90 border border-white/5 rounded-xl p-3 mb-5 flex items-center gap-3 text-xs text-grayText">
+                    <i class="fa-solid fa-truck-fast text-neon text-base"></i>
+                    <span>Envíos seguros por <strong>ZOOM / MRW</strong> y entregas personales en San Juan de los Morros.</span>
+                </div>
+
+                <button id="preview-add-btn" class="w-full bg-neon hover:bg-neonHover text-blackBg font-display font-black py-3.5 rounded-xl uppercase tracking-wider text-xs sm:text-sm flex items-center justify-center gap-2 neon-bg-glow touch-press transition-all shadow-lg">
+                    <i class="fa-solid fa-cart-plus text-base"></i> Añadir al Carrito
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nosotros -->
     <div id="nosotros-modal" class="fixed inset-0 bg-black/85 z-[100] opacity-0 pointer-events-none flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="nosotros-card relative bg-blackCard border border-neon/30 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl overflow-hidden">
             <button onclick="closeNosotros()" class="absolute top-4 right-4 text-grayText hover:text-whiteText text-xl active:scale-75 transition-transform z-20"><i class="fa-solid fa-xmark"></i></button>
@@ -325,7 +465,7 @@
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-20 md:bottom-5 left-1/2 -translate-x-1/2 bg-blackBg border border-neon/50 text-white px-4 py-2 rounded-full shadow-lg z-50 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2 text-xs pointer-events-none">
+    <div id="toast" class="fixed bottom-20 md:bottom-5 left-1/2 -translate-x-1/2 bg-blackBg border border-neon/50 text-white px-4 py-2 rounded-full shadow-lg z-[110] transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2 text-xs pointer-events-none">
         <i class="fa-solid fa-check text-neon"></i><span id="toast-msg" class="font-semibold">Agregado</span>
     </div>
 
@@ -348,7 +488,6 @@
         const emptyState = document.getElementById('empty-state');
         const dynamicText = document.getElementById('dynamic-text');
 
-        // Función para normalizar categorías y corregir variaciones al vuelo
         function normalizeCategory(cat) {
             if (!cat) return 'General';
             let clean = cat.toLowerCase().trim();
@@ -428,7 +567,8 @@
 
             filtered.forEach(p => {
                 const card = document.createElement('div');
-                card.className = "bg-blackCard border border-white/5 rounded-xl overflow-hidden flex flex-col relative shadow-md reveal active group hover:border-neon/40 transition-colors";
+                card.className = "bg-blackCard border border-white/5 rounded-xl overflow-hidden flex flex-col relative shadow-md reveal active group hover:border-neon/40 transition-colors cursor-pointer";
+                card.onclick = () => openProductPreview(p.id);
                 
                 let imageHtml = p.img 
                     ? `<img src="${p.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -443,6 +583,9 @@
                         ${imageHtml}
                         <div class="absolute inset-0 bg-gradient-to-t from-blackBg to-transparent opacity-40 group-hover:opacity-20 transition-opacity"></div>
                         <span class="absolute top-2.5 right-2.5 text-[8px] sm:text-[9px] uppercase font-bold bg-black/70 backdrop-blur-sm text-whiteText px-2 py-0.5 rounded border border-white/10 shadow-md">${displayCategory}</span>
+                        <span class="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm text-neon border border-neon/30 w-6 h-6 rounded-full flex items-center justify-center text-[10px] opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
+                            <i class="fa-solid fa-expand"></i>
+                        </span>
                     </div>
                     <div class="p-3 sm:p-4 flex flex-col flex-grow">
                         <h3 class="font-bold text-xs sm:text-sm mb-1.5 truncate group-hover:text-neon transition-colors">${p.name}</h3>
@@ -454,6 +597,254 @@
                 `;
                 grid.appendChild(card);
             });
+        }
+
+        function openProductPreview(id) {
+            const prod = activeProducts.find(p => String(p.id) === String(id));
+            if (!prod) return;
+
+            const modal = document.getElementById('preview-modal');
+            const imgEl = document.getElementById('preview-img');
+            const noImgEl = document.getElementById('preview-no-img');
+            
+            if (prod.img) {
+                imgEl.src = prod.img;
+                imgEl.style.display = 'block';
+                noImgEl.classList.add('hidden');
+                noImgEl.classList.remove('flex');
+                imgEl.onerror = () => {
+                    imgEl.style.display = 'none';
+                    noImgEl.classList.remove('hidden');
+                    noImgEl.classList.add('flex');
+                };
+            } else {
+                imgEl.style.display = 'none';
+                noImgEl.classList.remove('hidden');
+                noImgEl.classList.add('flex');
+            }
+
+            document.getElementById('preview-category').textContent = normalizeCategory(prod.category);
+            document.getElementById('preview-title').textContent = prod.name;
+            document.getElementById('preview-price').textContent = `$${parseFloat(prod.price).toFixed(2)}`;
+
+            const addBtn = document.getElementById('preview-add-btn');
+            addBtn.onclick = (e) => {
+                addToCart(prod.id, addBtn, e);
+            };
+
+            modal.classList.add('preview-open');
+        }
+
+        function closeProductPreview() {
+            document.getElementById('preview-modal').classList.remove('preview-open');
+        }
+
+        document.getElementById('preview-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'preview-modal') closeProductPreview();
+        });
+
+        // =========================================================
+        // 🤖 MOTOR DE IA Y BOTÓN DE REINICIAR CHAT
+        // =========================================================
+        function openGuaribot() {
+            document.getElementById('guaribot-modal').classList.add('guaribot-open');
+            document.getElementById('chatbot-input').focus();
+            createParticles(window.innerWidth/2, window.innerHeight/2, '#39ff14', 'fa-robot');
+        }
+
+        function closeGuaribot() {
+            document.getElementById('guaribot-modal').classList.remove('guaribot-open');
+        }
+
+        // Función para limpiar y reiniciar el chat al estado inicial
+        function resetChat() {
+            const container = document.getElementById('chatbot-messages');
+            container.innerHTML = `
+                <div class="flex items-start gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-neon/15 border border-neon/40 flex items-center justify-center text-neon shrink-0 shadow-sm">
+                        <i class="fa-solid fa-robot text-xs"></i>
+                    </div>
+                    <div class="bg-blackCard border border-white/10 rounded-2xl rounded-tl-none p-4 text-whiteText max-w-[85%] shadow-lg leading-relaxed">
+                        <p class="font-semibold text-neon mb-1">¡Chat reiniciado! ⚡</p>
+                        Soy <strong class="text-whiteText">Guaribot AI</strong>. ¿Qué producto, accesorio o información necesitas consultar ahora?
+                    </div>
+                </div>
+            `;
+            showToast("Chat reiniciado con éxito");
+        }
+
+        document.getElementById('guaribot-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'guaribot-modal') closeGuaribot();
+        });
+
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('chatbot-input');
+            const rawQuery = inputEl.value.trim();
+            if(!rawQuery) return;
+
+            appendUserMessage(rawQuery);
+            inputEl.value = '';
+
+            showTypingIndicator();
+
+            setTimeout(() => {
+                removeTypingIndicator();
+                processGuaribotAI(rawQuery);
+            }, 900);
+        }
+
+        function appendUserMessage(text) {
+            const container = document.getElementById('chatbot-messages');
+            container.innerHTML += `
+                <div class="flex items-start justify-end gap-2.5">
+                    <div class="bg-neon/15 border border-neon/30 rounded-2xl rounded-tr-none p-3.5 text-whiteText max-w-[85%] shadow-md leading-relaxed">
+                        ${escapeHTML(text)}
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-blackBg border border-neon/50 flex items-center justify-center text-neon shrink-0 shadow-sm">
+                        <i class="fa-solid fa-user text-xs"></i>
+                    </div>
+                </div>
+            `;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const container = document.getElementById('chatbot-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = "flex items-start gap-2.5";
+            typingDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-neon/10 border border-neon/40 flex items-center justify-center text-neon shrink-0 shadow-sm">
+                    <i class="fa-solid fa-robot text-xs"></i>
+                </div>
+                <div class="bg-blackCard border border-white/10 rounded-2xl rounded-tl-none p-3.5 text-whiteText shadow-lg flex items-center gap-1.5 h-10">
+                    <span class="w-2 h-2 rounded-full bg-neon typing-dot-1"></span>
+                    <span class="w-2 h-2 rounded-full bg-neon typing-dot-2"></span>
+                    <span class="w-2 h-2 rounded-full bg-neon typing-dot-3"></span>
+                </div>
+            `;
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typingDiv = document.getElementById('typing-indicator');
+            if(typingDiv) typingDiv.remove();
+        }
+
+        function appendBotMessage(htmlContent) {
+            const container = document.getElementById('chatbot-messages');
+            container.innerHTML += `
+                <div class="flex items-start gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-neon/10 border border-neon/40 flex items-center justify-center text-neon shrink-0 shadow-sm">
+                        <i class="fa-solid fa-robot text-xs"></i>
+                    </div>
+                    <div class="bg-blackCard border border-white/10 rounded-2xl rounded-tl-none p-4 text-whiteText max-w-[88%] shadow-lg leading-relaxed space-y-2.5">
+                        ${htmlContent}
+                    </div>
+                </div>
+            `;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function cleanText(txt) {
+            return (txt || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        }
+
+        function processGuaribotAI(query) {
+            const q = cleanText(query);
+            
+            // 1. Ubicación
+            if (q.includes('ubicacion') || q.includes('donde') || q.includes('direccion') || q.includes('local') || q.includes('san juan') || q.includes('guarico') || q.includes('queda')) {
+                appendBotMessage(`
+                    <p class="font-bold text-neon mb-1">📍 Nuestra Ubicación:</p>
+                    <p>Nos encontramos en <strong>San Juan de los Morros, Estado Guárico</strong>[cite: 1].</p>
+                    <p class="text-grayText text-[11px] mt-1">Hacemos entregas personales y envíos nacionales cobro a destino por ZOOM y MRW[cite: 1].</p>
+                `);
+                return;
+            }
+
+            // 2. Redes / Contacto / WhatsApp / Número
+            if (q.includes('redes') || q.includes('contacto') || q.includes('numero') || q.includes('telefono') || q.includes('whatsapp') || q.includes('tiktok') || q.includes('instagram') || q.includes('llamar') || q.includes('insta')) {
+                appendBotMessage(`
+                    <p class="font-bold text-neon mb-1">📞 Canales Oficiales:</p>
+                    <p>WhatsApp directo: <strong>+58 424-3006567</strong></p>
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <a href="https://wa.me/584243006567" target="_blank" class="bg-[#25D366]/20 border border-[#25D366]/40 text-[#25D366] px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp"></i> Escribir al WhatsApp</a>
+                        <a href="https://www.tiktok.com/@guari_shop" target="_blank" class="bg-white/10 border border-white/20 text-white px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5"><i class="fa-brands fa-tiktok"></i> Ver TikTok</a>
+                    </div>
+                `);
+                return;
+            }
+
+            // 3. Envíos
+            if (q.includes('envio') || q.includes('zoom') || q.includes('mrw') || q.includes('cobro') || q.includes('delivery')) {
+                appendBotMessage(`
+                    <p class="font-bold text-neon mb-1">📦 Información de Envíos:</p>
+                    <p>Realizamos despachos a nivel nacional cobro a destino a través de:</p>
+                    <ul class="list-disc pl-4 text-white font-bold space-y-0.5 my-1">
+                        <li>MRW[cite: 1]</li>
+                        <li>ZOOM[cite: 1]</li>
+                    </ul>
+                    <p class="text-grayText text-[11px]">También puedes retirar tu pedido personalmente en San Juan de los Morros[cite: 1].</p>
+                `);
+                return;
+            }
+
+            // 4. Búsqueda de Productos en Supabase[cite: 1]
+            let matches = activeProducts.filter(p => {
+                let nameClean = cleanText(p.name);
+                let catClean = cleanText(p.category);
+                
+                if (nameClean.includes(q) || catClean.includes(q)) return true;
+                
+                const queryWords = q.split(/\s+/).filter(w => w.length > 1);
+                if (queryWords.length > 0) {
+                    let matchedWords = queryWords.filter(word => nameClean.includes(word) || catClean.includes(word));
+                    return matchedWords.length > 0;
+                }
+                return false;
+            });
+
+            if (matches.length > 0) {
+                let htmlResponse = `<p class="font-bold text-neon mb-1">🔍 Productos encontrados:</p><div class="space-y-2.5 mt-2 max-h-60 overflow-y-auto pr-1">`;
+                
+                matches.slice(0, 6).forEach(item => {
+                    htmlResponse += `
+                        <div class="flex items-center justify-between bg-blackBg p-2.5 rounded-2xl border border-white/10 gap-2 shadow-sm">
+                            <div class="flex items-center gap-2.5 overflow-hidden">
+                                <img src="${item.img}" class="w-10 h-10 object-cover rounded-xl bg-blackCard shrink-0 border border-white/5" onerror="this.style.display='none'">
+                                <div class="truncate">
+                                    <h4 class="text-xs font-bold text-whiteText truncate">${item.name}</h4>
+                                    <span class="text-neon text-[11px] font-black">$${parseFloat(item.price).toFixed(2)}</span>
+                                </div>
+                            </div>
+                            <button onclick="closeGuaribot(); openProductPreview('${item.id}');" class="shrink-0 bg-neon hover:bg-neonHover text-blackBg font-black text-[10px] px-3.5 py-2 rounded-xl transition-all uppercase touch-press shadow-md">
+                                Ver
+                            </button>
+                        </div>
+                    `;
+                });
+                htmlResponse += `</div>`;
+                appendBotMessage(htmlResponse);
+            } else {
+                let htmlResponse = `<p class="font-bold text-whiteText mb-1">⚡ He revisado nuestro inventario y te sugiero explorar:</p>`;
+                htmlResponse += `<div class="grid grid-cols-2 gap-2 mt-2">
+                    <button onclick="closeGuaribot(); filterCategory('audifonos');" class="bg-blackBg border border-white/10 hover:border-neon p-2.5 rounded-xl text-left text-xs font-bold text-neon touch-press">🎧 Audífonos</button>
+                    <button onclick="closeGuaribot(); filterCategory('cargadores');" class="bg-blackBg border border-white/10 hover:border-neon p-2.5 rounded-xl text-left text-xs font-bold text-neon touch-press">🔌 Cargadores</button>
+                    <button onclick="closeGuaribot(); filterCategory('forros');" class="bg-blackBg border border-white/10 hover:border-neon p-2.5 rounded-xl text-left text-xs font-bold text-neon touch-press">📱 Forros</button>
+                    <button onclick="closeGuaribot(); filterCategory('iluminacion');" class="bg-blackBg border border-white/10 hover:border-neon p-2.5 rounded-xl text-left text-xs font-bold text-neon touch-press">💡 Iluminación</button>
+                </div>`;
+                htmlResponse += `<p class="text-grayText text-[11px] mt-2">También puedes consultar por WhatsApp <a href="https://wa.me/584243006567" target="_blank" class="text-neon underline font-bold">+58 424-3006567</a>[cite: 1].</p>`;
+                appendBotMessage(htmlResponse);
+            }
         }
 
         function createParticles(x, y, color, icon) {
@@ -541,24 +932,29 @@
         }
 
         function addToCart(id, btn, e) {
+            if (e) e.stopPropagation();
             const prod = activeProducts.find(p => String(p.id) === String(id));
             if (!prod) return;
             const exist = cart.find(i => String(i.id) === String(id));
             if(exist) exist.qty++; else cart.push({...prod, qty: 1});
             
-            createParticles(e.clientX, e.clientY, '#39ff14', 'fa-bolt');
+            if (e && e.clientX) {
+                createParticles(e.clientX, e.clientY, '#39ff14', 'fa-bolt');
+            }
             showToast(`${prod.name} añadido`);
             
             const ogHtml = btn.innerHTML;
             btn.classList.add('bg-neon', 'text-blackBg');
-            btn.innerHTML = `<span class="relative z-10 flex items-center gap-1.5"><i class="fa-solid fa-check"></i> Listo</span>`;
+            btn.innerHTML = `<span class="relative z-10 flex items-center gap-1.5"><i class="fa-solid fa-check"></i> ¡Añadido!</span>`;
             
             const cCount = document.getElementById('cart-count');
             cCount.classList.add('scale-150'); setTimeout(() => cCount.classList.remove('scale-150'), 300);
 
             setTimeout(() => { 
                 btn.innerHTML = ogHtml; 
-                btn.classList.remove('bg-neon', 'text-blackBg'); 
+                if (btn.id !== 'preview-add-btn') {
+                    btn.classList.remove('bg-neon', 'text-blackBg'); 
+                }
             }, 1000);
             
             updateCartUI();
@@ -607,7 +1003,7 @@
         function showToast(msg) {
             const t = document.getElementById('toast');
             document.getElementById('toast-msg').textContent = msg;
-            t.classList.replace('translate-y-20', 'translate-y-0'); t.classList.replace('opacity-0', 'opacity-100');
+            t.classList.replace('translate-y-20', 'translate-y-0'); t.classList.replace('opacity-100', 'opacity-0');
             setTimeout(() => { t.classList.replace('translate-y-0', 'translate-y-20'); t.classList.replace('opacity-100', 'opacity-0'); }, 2000);
         }
 

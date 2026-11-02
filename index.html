@@ -2,6 +2,7 @@
 <html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
+    <!-- Viewport optimizado para evitar zoom extraño y asegurar control de escala en móviles -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GuariShop | Tecnología y Accesorios</title>
     
@@ -158,7 +159,6 @@
                 <a href="#" onclick="openNosotros(event)" class="text-whiteText hover:text-neon transition-colors font-medium text-sm uppercase tracking-wider">Nosotros</a>
             </nav>
             <div class="flex items-center gap-3">
-                <!-- Botón superior derecho de Guaribot AI -->
                 <button onclick="openGuaribot()" class="relative p-2.5 bg-blackCard border border-neon/60 hover:border-neon text-neon transition-all flex items-center justify-center rounded-xl active:scale-95 shadow-[0_0_15px_rgba(57,255,20,0.3)] group touch-press" title="Abrir Guaribot AI">
                     <i class="fa-solid fa-robot text-lg group-hover:scale-110 transition-transform"></i>
                     <span class="absolute -top-1 -right-1 flex h-3 w-3">
@@ -191,7 +191,6 @@
         </button>
     </nav>
 
-    <!-- 🤖 BOTÓN FLOTANTE INFERIOR DERECHO (GUARIBOT AI) -->
     <div class="fixed bottom-20 md:bottom-6 right-5 z-40">
         <button onclick="openGuaribot()" class="bg-blackCard border-2 border-neon hover:bg-neon hover:text-blackBg text-neon font-display font-bold px-4 py-3 rounded-2xl shadow-[0_0_25px_rgba(57,255,20,0.4)] flex items-center gap-2.5 transition-all duration-300 group touch-press">
             <div class="w-8 h-8 rounded-full bg-neon text-blackBg group-hover:bg-blackBg group-hover:text-neon flex items-center justify-center transition-colors">
@@ -261,10 +260,8 @@
             </div>
         </div>
 
-        <!-- Grid de Productos -->
         <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"></div>
 
-        <!-- Estado Vacío / Cargando -->
         <div id="empty-state" class="flex flex-col items-center justify-center py-16 text-center border border-dashed border-white/10 rounded-2xl bg-blackCard/50 reveal">
             <i class="fa-solid fa-satellite-dish text-4xl text-neon/50 mb-3 animate-pulse"></i>
             <h3 class="text-lg font-bold mb-1">Cargando Catálogo...</h3>
@@ -299,65 +296,65 @@
         </div>
     </footer>
 
-    <!-- MODAL DE GUARIBOT AI (CON BOTÓN DE REINICIAR/LIMPIAR CHAT) -->
-    <div id="guaribot-modal" class="fixed inset-0 bg-black/85 z-[120] opacity-0 pointer-events-none flex items-center justify-center p-3 sm:p-4 backdrop-blur-md">
-        <div class="guaribot-card relative bg-blackCard border-2 border-neon/60 rounded-3xl max-w-lg w-full h-[88vh] sm:h-[620px] shadow-[0_0_60px_rgba(57,255,20,0.3)] flex flex-col overflow-hidden">
+    <!-- ========================================================= -->
+    <!-- 🤖 MODAL DE GUARIBOT AI OPTIMIZADO PARA ANDROID / MÓVILES -->
+    <!-- ========================================================= -->
+    <div id="guaribot-modal" class="fixed inset-0 bg-black/85 z-[120] opacity-0 pointer-events-none flex items-center justify-center p-2 sm:p-4 backdrop-blur-md">
+        <!-- Contenedor adaptado con altura máxima flexible h-[82vh] o h-[500px] para que encaje perfecto en pantallas pequeñas -->
+        <div class="guaribot-card relative bg-blackCard border-2 border-neon/60 rounded-3xl w-full max-w-lg h-[82vh] max-h-[550px] sm:h-[580px] shadow-[0_0_50px_rgba(57,255,20,0.3)] flex flex-col overflow-hidden">
             
             <!-- Header del Chatbot -->
-            <div class="p-4 bg-gradient-to-r from-blackBg via-blackCard to-blackBg border-b border-neon/30 flex justify-between items-center shadow-md">
-                <div class="flex items-center gap-3">
+            <div class="p-3 sm:p-4 bg-gradient-to-r from-blackBg via-blackCard to-blackBg border-b border-neon/30 flex justify-between items-center shadow-md shrink-0">
+                <div class="flex items-center gap-2.5">
                     <div class="relative">
-                        <div class="w-11 h-11 bg-blackBg border-2 border-neon rounded-2xl flex items-center justify-center neon-bg-glow">
-                            <i class="fa-solid fa-robot text-neon text-xl animate-pulse"></i>
+                        <div class="w-9 h-9 sm:w-10 sm:h-10 bg-blackBg border-2 border-neon rounded-xl sm:rounded-2xl flex items-center justify-center neon-bg-glow">
+                            <i class="fa-solid fa-robot text-neon text-base sm:text-lg animate-pulse"></i>
                         </div>
-                        <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-blackBg rounded-full"></span>
+                        <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-blackBg rounded-full"></span>
                     </div>
                     <div>
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-display font-black text-sm sm:text-base uppercase tracking-wide text-whiteText">Guaribot <span class="neon-text">AI</span></h3>
-                            <span class="bg-neon/10 text-neon text-[9px] font-black px-2 py-0.5 rounded-full border border-neon/30">PRO</span>
+                        <div class="flex items-center gap-1.5">
+                            <h3 class="font-display font-black text-xs sm:text-sm uppercase tracking-wide text-whiteText">Guaribot <span class="neon-text">AI</span></h3>
+                            <span class="bg-neon/10 text-neon text-[8px] sm:text-[9px] font-black px-1.5 py-0.2 rounded-full border border-neon/30">PRO</span>
                         </div>
-                        <p class="text-[11px] text-emerald-400 font-medium flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> En línea para ayudarte
+                        <p class="text-[10px] sm:text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> En línea
                         </p>
                     </div>
                 </div>
                 
                 <div class="flex items-center gap-2">
-                    <!-- Botón para reiniciar/limpiar chat -->
-                    <button onclick="resetChat()" class="w-9 h-9 rounded-full bg-black/80 border border-white/10 text-grayText hover:text-neon hover:border-neon flex items-center justify-center text-sm active:scale-75 transition-all shadow-md" title="Reiniciar chat">
+                    <button onclick="resetChat()" class="w-8 h-8 rounded-full bg-black/80 border border-white/10 text-grayText hover:text-neon hover:border-neon flex items-center justify-center text-xs active:scale-75 transition-all shadow-md" title="Reiniciar chat">
                         <i class="fa-solid fa-rotate-right"></i>
                     </button>
-                    <!-- Botón cerrar -->
-                    <button onclick="closeGuaribot()" class="w-9 h-9 rounded-full bg-black/80 border border-white/10 text-whiteText hover:text-neon hover:border-neon flex items-center justify-center text-lg active:scale-75 transition-all shadow-md" title="Cerrar">
+                    <button onclick="closeGuaribot()" class="w-8 h-8 rounded-full bg-black/80 border border-white/10 text-whiteText hover:text-neon hover:border-neon flex items-center justify-center text-base active:scale-75 transition-all shadow-md" title="Cerrar">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Cuerpo del Chat -->
-            <div id="chatbot-messages" class="flex-grow overflow-y-auto p-4 space-y-4 text-xs sm:text-sm bg-[#07090c]">
-                <!-- Saludo inicial del bot -->
-                <div class="flex items-start gap-2.5">
-                    <div class="w-8 h-8 rounded-full bg-neon/15 border border-neon/40 flex items-center justify-center text-neon shrink-0 shadow-sm">
-                        <i class="fa-solid fa-robot text-xs"></i>
+            <!-- Cuerpo del Chat con scroll fluido -->
+            <div id="chatbot-messages" class="flex-grow overflow-y-auto p-3 sm:p-4 space-y-3 text-xs sm:text-sm bg-[#07090c] overscroll-contain">
+                <div class="flex items-start gap-2">
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-neon/15 border border-neon/40 flex items-center justify-center text-neon shrink-0 shadow-sm">
+                        <i class="fa-solid fa-robot text-[10px] sm:text-xs"></i>
                     </div>
-                    <div class="bg-blackCard border border-white/10 rounded-2xl rounded-tl-none p-4 text-whiteText max-w-[85%] shadow-lg leading-relaxed">
+                    <div class="bg-blackCard border border-white/10 rounded-2xl rounded-tl-none p-3 sm:p-3.5 text-whiteText max-w-[85%] shadow-lg leading-relaxed text-xs sm:text-sm">
                         <p class="font-semibold text-neon mb-1">¡Hola, bienvenido a GuariShop! ⚡</p>
-                        Soy <strong class="text-whiteText">Guaribot AI</strong>. Puedo mostrarte audífonos, cargadores, forros, AirPods, ubicación o cualquier artículo al instante. ¿Qué buscamos hoy?
+                        Soy <strong class="text-whiteText">Guaribot AI</strong>. Puedo mostrarte audífonos, cargadores, forros, ubicación o precios al instante. ¿Qué buscamos hoy?
                     </div>
                 </div>
             </div>
 
-            <!-- Input de Texto -->
-            <div class="p-3.5 sm:p-4 bg-blackBg border-t border-neon/20 shadow-inner">
-                <form onsubmit="handleChatSubmit(event)" class="flex gap-2.5 items-center">
+            <!-- Input de Texto Compacto para Android -->
+            <div class="p-2.5 sm:p-3 bg-blackBg border-t border-neon/20 shadow-inner shrink-0">
+                <form onsubmit="handleChatSubmit(event)" class="flex gap-2 items-center">
                     <div class="relative flex-grow">
-                        <input type="text" id="chatbot-input" placeholder="Pregunta por un producto, ubicación, etc..." class="w-full bg-blackCard border border-white/15 focus:border-neon rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-whiteText outline-none transition-colors shadow-inner pr-10">
-                        <i class="fa-solid fa-sparkles text-neon/40 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        <input type="text" id="chatbot-input" placeholder="Pregunta por un producto..." class="w-full bg-blackCard border border-white/15 focus:border-neon rounded-xl sm:rounded-2xl px-3.5 py-2.5 sm:py-3 text-xs sm:text-sm text-whiteText outline-none transition-colors shadow-inner pr-8">
+                        <i class="fa-solid fa-sparkles text-neon/40 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-xs"></i>
                     </div>
-                    <button type="submit" class="bg-neon hover:bg-neonHover text-blackBg w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm neon-bg-glow active:scale-95 transition-all shrink-0">
-                        <i class="fa-solid fa-paper-plane text-base"></i>
+                    <button type="submit" class="bg-neon hover:bg-neonHover text-blackBg w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl flex items-center justify-center font-bold text-xs neon-bg-glow active:scale-95 transition-all shrink-0">
+                        <i class="fa-solid fa-paper-plane text-sm"></i>
                     </button>
                 </form>
             </div>
@@ -371,7 +368,7 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <div class="relative h-72 sm:h-80 bg-blackBg border-b border-white/10 flex items-center justify-center overflow-hidden">
+            <div class="relative h-64 sm:h-80 bg-blackBg border-b border-white/10 flex items-center justify-center overflow-hidden">
                 <img id="preview-img" src="" alt="Vista previa" class="w-full h-full object-contain p-2 transition-transform duration-500">
                 <div id="preview-no-img" class="hidden absolute inset-0 items-center justify-center text-white/10">
                     <i class="fa-solid fa-box text-6xl"></i>
@@ -470,9 +467,6 @@
     </div>
 
     <script>
-        // =========================================================
-        // ⚡ CONEXIÓN DIRECTA A SUPABASE (GUARISHOP)
-        // =========================================================
         const SUPABASE_URL = "https://jouqjbutkvqqvqgmzlux.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvdXFqYnV0a3ZxcXZxZ216bHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2MDM0OTYsImV4cCI6MjEwODE3OTQ5Nn0.MH8aHBdnsR99EFTf92OzXVi3oKNBKpuqjq5SYSAzsFI";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -643,9 +637,6 @@
             if (e.target.id === 'preview-modal') closeProductPreview();
         });
 
-        // =========================================================
-        // 🤖 MOTOR DE IA Y BOTÓN DE REINICIAR CHAT
-        // =========================================================
         function openGuaribot() {
             document.getElementById('guaribot-modal').classList.add('guaribot-open');
             document.getElementById('chatbot-input').focus();
@@ -656,21 +647,20 @@
             document.getElementById('guaribot-modal').classList.remove('guaribot-open');
         }
 
-        // Función para limpiar y reiniciar el chat al estado inicial
         function resetChat() {
             const container = document.getElementById('chatbot-messages');
             container.innerHTML = `
-                <div class="flex items-start gap-2.5">
-                    <div class="w-8 h-8 rounded-full bg-neon/15 border border-neon/40 flex items-center justify-center text-neon shrink-0 shadow-sm">
-                        <i class="fa-solid fa-robot text-xs"></i>
+                <div class="flex items-start gap-2">
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-neon/15 border border-neon/40 flex items-center justify-center text-neon shrink-0 shadow-sm">
+                        <i class="fa-solid fa-robot text-[10px] sm:text-xs"></i>
                     </div>
-                    <div class="bg-blackCard border border-white/10 rounded-2xl rounded-tl-none p-4 text-whiteText max-w-[85%] shadow-lg leading-relaxed">
+                    <div class="bg-blackCard border border-white/10 rounded-2xl rounded-tl-none p-3 sm:p-3.5 text-whiteText max-w-[85%] shadow-lg leading-relaxed text-xs sm:text-sm">
                         <p class="font-semibold text-neon mb-1">¡Chat reiniciado! ⚡</p>
-                        Soy <strong class="text-whiteText">Guaribot AI</strong>. ¿Qué producto, accesorio o información necesitas consultar ahora?
+                        Soy <strong class="text-whiteText">Guaribot AI</strong>. ¿Qué producto o accesorio necesitas consultar ahora?
                     </div>
                 </div>
             `;
-            showToast("Chat reiniciado con éxito");
+            showToast("Chat reiniciado");
         }
 
         document.getElementById('guaribot-modal').addEventListener('click', (e) => {
@@ -697,12 +687,12 @@
         function appendUserMessage(text) {
             const container = document.getElementById('chatbot-messages');
             container.innerHTML += `
-                <div class="flex items-start justify-end gap-2.5">
-                    <div class="bg-neon/15 border border-neon/30 rounded-2xl rounded-tr-none p-3.5 text-whiteText max-w-[85%] shadow-md leading-relaxed">
+                <div class="flex items-start justify-end gap-2">
+                    <div class="bg-neon/15 border border-neon/30 rounded-2xl rounded-tr-none p-3 text-whiteText max-w-[85%] shadow-md leading-relaxed text-xs sm:text-sm">
                         ${escapeHTML(text)}
                     </div>
-                    <div class="w-8 h-8 rounded-full bg-blackBg border border-neon/50 flex items-center justify-center text-neon shrink-0 shadow-sm">
-                        <i class="fa-solid fa-user text-xs"></i>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blackBg border border-neon/50 flex items-center justify-center text-neon shrink-0 shadow-sm">
+                        <i class="fa-solid fa-user text-[10px] sm:text-xs"></i>
                     </div>
                 </div>
             `;
@@ -713,15 +703,15 @@
             const container = document.getElementById('chatbot-messages');
             const typingDiv = document.createElement('div');
             typingDiv.id = 'typing-indicator';
-            typingDiv.className = "flex items-start gap-2.5";
+            typingDiv.className = "flex items-start gap-2";
             typingDiv.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-neon/10 border border-neon/40 flex items-center justify-center text-neon shrink-0 shadow-sm">
-                    <i class="fa-solid fa-robot text-xs"></i>
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-neon/10 border border-neon/40 flex items-center justify-center text-neon shrink-0 shadow-sm">
+                    <i class="fa-solid fa-robot text-[10px] sm:text-xs"></i>
                 </div>
-                <div class="bg-blackCard border border-white/10 rounded-2xl rounded-tl-none p-3.5 text-whiteText shadow-lg flex items-center gap-1.5 h-10">
-                    <span class="w-2 h-2 rounded-full bg-neon typing-dot-1"></span>
-                    <span class="w-2 h-2 rounded-full bg-neon typing-dot-2"></span>
-                    <span class="w-2 h-2 rounded-full bg-neon typing-dot-3"></span>
+                <div class="bg-blackCard border border-white/10 rounded-2xl rounded-tl-none p-3 text-whiteText shadow-lg flex items-center gap-1.5 h-9">
+                    <span class="w-1.5 h-1.5 rounded-full bg-neon typing-dot-1"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-neon typing-dot-2"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-neon typing-dot-3"></span>
                 </div>
             `;
             container.appendChild(typingDiv);
@@ -736,11 +726,11 @@
         function appendBotMessage(htmlContent) {
             const container = document.getElementById('chatbot-messages');
             container.innerHTML += `
-                <div class="flex items-start gap-2.5">
-                    <div class="w-8 h-8 rounded-full bg-neon/10 border border-neon/40 flex items-center justify-center text-neon shrink-0 shadow-sm">
-                        <i class="fa-solid fa-robot text-xs"></i>
+                <div class="flex items-start gap-2">
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-neon/10 border border-neon/40 flex items-center justify-center text-neon shrink-0 shadow-sm">
+                        <i class="fa-solid fa-robot text-[10px] sm:text-xs"></i>
                     </div>
-                    <div class="bg-blackCard border border-white/10 rounded-2xl rounded-tl-none p-4 text-whiteText max-w-[88%] shadow-lg leading-relaxed space-y-2.5">
+                    <div class="bg-blackCard border border-white/10 rounded-2xl rounded-tl-none p-3.5 text-whiteText max-w-[88%] shadow-lg leading-relaxed space-y-2 text-xs sm:text-sm">
                         ${htmlContent}
                     </div>
                 </div>
@@ -761,44 +751,40 @@
         function processGuaribotAI(query) {
             const q = cleanText(query);
             
-            // 1. Ubicación
             if (q.includes('ubicacion') || q.includes('donde') || q.includes('direccion') || q.includes('local') || q.includes('san juan') || q.includes('guarico') || q.includes('queda')) {
                 appendBotMessage(`
                     <p class="font-bold text-neon mb-1">📍 Nuestra Ubicación:</p>
                     <p>Nos encontramos en <strong>San Juan de los Morros, Estado Guárico</strong>[cite: 1].</p>
-                    <p class="text-grayText text-[11px] mt-1">Hacemos entregas personales y envíos nacionales cobro a destino por ZOOM y MRW[cite: 1].</p>
+                    <p class="text-grayText text-[10px] sm:text-[11px] mt-1">Hacemos entregas personales y envíos nacionales cobro a destino por ZOOM y MRW[cite: 1].</p>
                 `);
                 return;
             }
 
-            // 2. Redes / Contacto / WhatsApp / Número
             if (q.includes('redes') || q.includes('contacto') || q.includes('numero') || q.includes('telefono') || q.includes('whatsapp') || q.includes('tiktok') || q.includes('instagram') || q.includes('llamar') || q.includes('insta')) {
                 appendBotMessage(`
                     <p class="font-bold text-neon mb-1">📞 Canales Oficiales:</p>
-                    <p>WhatsApp directo: <strong>+58 424-3006567</strong></p>
-                    <div class="flex flex-wrap gap-2 pt-2">
-                        <a href="https://wa.me/584243006567" target="_blank" class="bg-[#25D366]/20 border border-[#25D366]/40 text-[#25D366] px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp"></i> Escribir al WhatsApp</a>
-                        <a href="https://www.tiktok.com/@guari_shop" target="_blank" class="bg-white/10 border border-white/20 text-white px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5"><i class="fa-brands fa-tiktok"></i> Ver TikTok</a>
+                    <p>WhatsApp: <strong>+58 424-3006567</strong></p>
+                    <div class="flex flex-wrap gap-1.5 pt-1.5">
+                        <a href="https://wa.me/584243006567" target="_blank" class="bg-[#25D366]/20 border border-[#25D366]/40 text-[#25D366] px-2.5 py-1 rounded-lg text-[11px] font-bold inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+                        <a href="https://www.tiktok.com/@guari_shop" target="_blank" class="bg-white/10 border border-white/20 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold inline-flex items-center gap-1"><i class="fa-brands fa-tiktok"></i> TikTok</a>
                     </div>
                 `);
                 return;
             }
 
-            // 3. Envíos
             if (q.includes('envio') || q.includes('zoom') || q.includes('mrw') || q.includes('cobro') || q.includes('delivery')) {
                 appendBotMessage(`
-                    <p class="font-bold text-neon mb-1">📦 Información de Envíos:</p>
-                    <p>Realizamos despachos a nivel nacional cobro a destino a través de:</p>
+                    <p class="font-bold text-neon mb-1">📦 Envíos Nacionales:</p>
+                    <p>Despachos cobro a destino a través de:</p>
                     <ul class="list-disc pl-4 text-white font-bold space-y-0.5 my-1">
                         <li>MRW[cite: 1]</li>
                         <li>ZOOM[cite: 1]</li>
                     </ul>
-                    <p class="text-grayText text-[11px]">También puedes retirar tu pedido personalmente en San Juan de los Morros[cite: 1].</p>
+                    <p class="text-grayText text-[10px] sm:text-[11px]">También entregas personales en San Juan de los Morros[cite: 1].</p>
                 `);
                 return;
             }
 
-            // 4. Búsqueda de Productos en Supabase[cite: 1]
             let matches = activeProducts.filter(p => {
                 let nameClean = cleanText(p.name);
                 let catClean = cleanText(p.category);
@@ -814,19 +800,19 @@
             });
 
             if (matches.length > 0) {
-                let htmlResponse = `<p class="font-bold text-neon mb-1">🔍 Productos encontrados:</p><div class="space-y-2.5 mt-2 max-h-60 overflow-y-auto pr-1">`;
+                let htmlResponse = `<p class="font-bold text-neon mb-1">🔍 Coincidencias:</p><div class="space-y-2 mt-1.5 max-h-44 overflow-y-auto pr-1">`;
                 
-                matches.slice(0, 6).forEach(item => {
+                matches.slice(0, 5).forEach(item => {
                     htmlResponse += `
-                        <div class="flex items-center justify-between bg-blackBg p-2.5 rounded-2xl border border-white/10 gap-2 shadow-sm">
-                            <div class="flex items-center gap-2.5 overflow-hidden">
-                                <img src="${item.img}" class="w-10 h-10 object-cover rounded-xl bg-blackCard shrink-0 border border-white/5" onerror="this.style.display='none'">
+                        <div class="flex items-center justify-between bg-blackBg p-2 rounded-xl border border-white/10 gap-2 shadow-sm">
+                            <div class="flex items-center gap-2 overflow-hidden">
+                                <img src="${item.img}" class="w-8 h-8 object-cover rounded-lg bg-blackCard shrink-0 border border-white/5" onerror="this.style.display='none'">
                                 <div class="truncate">
-                                    <h4 class="text-xs font-bold text-whiteText truncate">${item.name}</h4>
-                                    <span class="text-neon text-[11px] font-black">$${parseFloat(item.price).toFixed(2)}</span>
+                                    <h4 class="text-[11px] font-bold text-whiteText truncate">${item.name}</h4>
+                                    <span class="text-neon text-[10px] font-black">$${parseFloat(item.price).toFixed(2)}</span>
                                 </div>
                             </div>
-                            <button onclick="closeGuaribot(); openProductPreview('${item.id}');" class="shrink-0 bg-neon hover:bg-neonHover text-blackBg font-black text-[10px] px-3.5 py-2 rounded-xl transition-all uppercase touch-press shadow-md">
+                            <button onclick="closeGuaribot(); openProductPreview('${item.id}');" class="shrink-0 bg-neon hover:bg-neonHover text-blackBg font-black text-[9px] px-2.5 py-1.5 rounded-lg transition-all uppercase touch-press">
                                 Ver
                             </button>
                         </div>
@@ -835,14 +821,13 @@
                 htmlResponse += `</div>`;
                 appendBotMessage(htmlResponse);
             } else {
-                let htmlResponse = `<p class="font-bold text-whiteText mb-1">⚡ He revisado nuestro inventario y te sugiero explorar:</p>`;
-                htmlResponse += `<div class="grid grid-cols-2 gap-2 mt-2">
-                    <button onclick="closeGuaribot(); filterCategory('audifonos');" class="bg-blackBg border border-white/10 hover:border-neon p-2.5 rounded-xl text-left text-xs font-bold text-neon touch-press">🎧 Audífonos</button>
-                    <button onclick="closeGuaribot(); filterCategory('cargadores');" class="bg-blackBg border border-white/10 hover:border-neon p-2.5 rounded-xl text-left text-xs font-bold text-neon touch-press">🔌 Cargadores</button>
-                    <button onclick="closeGuaribot(); filterCategory('forros');" class="bg-blackBg border border-white/10 hover:border-neon p-2.5 rounded-xl text-left text-xs font-bold text-neon touch-press">📱 Forros</button>
-                    <button onclick="closeGuaribot(); filterCategory('iluminacion');" class="bg-blackBg border border-white/10 hover:border-neon p-2.5 rounded-xl text-left text-xs font-bold text-neon touch-press">💡 Iluminación</button>
+                let htmlResponse = `<p class="font-bold text-whiteText mb-1">⚡ Te sugiero explorar estas categorías:</p>`;
+                htmlResponse += `<div class="grid grid-cols-2 gap-1.5 mt-2">
+                    <button onclick="closeGuaribot(); filterCategory('audifonos');" class="bg-blackBg border border-white/10 hover:border-neon p-2 rounded-xl text-left text-[11px] font-bold text-neon touch-press">🎧 Audífonos</button>
+                    <button onclick="closeGuaribot(); filterCategory('cargadores');" class="bg-blackBg border border-white/10 hover:border-neon p-2 rounded-xl text-left text-[11px] font-bold text-neon touch-press">🔌 Cargadores</button>
+                    <button onclick="closeGuaribot(); filterCategory('forros');" class="bg-blackBg border border-white/10 hover:border-neon p-2 rounded-xl text-left text-[11px] font-bold text-neon touch-press">📱 Forros</button>
+                    <button onclick="closeGuaribot(); filterCategory('iluminacion');" class="bg-blackBg border border-white/10 hover:border-neon p-2 rounded-xl text-left text-[11px] font-bold text-neon touch-press">💡 Iluminación</button>
                 </div>`;
-                htmlResponse += `<p class="text-grayText text-[11px] mt-2">También puedes consultar por WhatsApp <a href="https://wa.me/584243006567" target="_blank" class="text-neon underline font-bold">+58 424-3006567</a>[cite: 1].</p>`;
                 appendBotMessage(htmlResponse);
             }
         }

@@ -7,6 +7,8 @@
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SDK Oficial de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -73,6 +75,7 @@
 </head>
 <body class="font-sans min-h-screen flex flex-col relative z-10">
 
+    <!-- Partículas Ambientales -->
     <div id="ambient-particles">
         <i class="fa-solid fa-bolt bg-particle text-xs" style="top: 15%; left: 10%; --duration: 7s; --dx: 40px; --dy: -50px;"></i>
         <i class="fa-solid fa-cloud-arrow-up bg-particle text-sm" style="top: 35%; left: 88%; --duration: 9s; --dx: -45px; --dy: 60px;"></i>
@@ -87,17 +90,15 @@
             </div>
             <h1 class="font-display font-bold text-xl uppercase tracking-wider text-whiteText">GuariShop <span class="text-neon">Studio</span></h1>
         </div>
-        <div class="flex gap-4 items-center">
+        <div class="flex gap-3 items-center">
             <span id="conn-status" class="flex items-center gap-2 text-xs font-bold text-grayText border border-white/10 px-3.5 py-2 rounded-xl bg-blackBg shadow-inner">
                 <i class="fa-solid fa-circle-notch animate-spin text-neon"></i> Conectando...
             </span>
             
-            <!-- Botón nuevo para resetear la clave -->
-            <button onclick="localStorage.removeItem('davi_github_token'); location.reload();" class="text-grayText hover:text-red-500 border border-white/10 hover:border-red-500/50 transition-all font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-2 bg-blackBg active:scale-95">
-                <i class="fa-solid fa-key"></i> Cambiar Token
+            <button onclick="fetchProducts()" class="text-grayText hover:text-neon border border-white/10 hover:border-neon/50 transition-all font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-2 bg-blackBg active:scale-95" title="Recargar lista">
+                <i class="fa-solid fa-rotate"></i>
             </button>
 
-            <!-- Aquí está el enlace corregido apuntando a index.html -->
             <a href="index.html" target="_blank" class="bg-neon/10 text-neon border border-neon/50 hover:bg-neon hover:text-blackBg transition-all font-bold px-4 py-2 rounded-xl text-xs uppercase flex items-center gap-2 neon-bg-glow active:scale-95">
                 <i class="fa-solid fa-store"></i> Ver Tienda
             </a>
@@ -144,7 +145,7 @@
                     <div>
                         <label class="block text-[11px] font-bold text-grayText mb-1.5 uppercase tracking-wider">Categoría</label>
                         <select id="productCategory" class="w-full bg-blackBg border border-white/10 rounded-xl px-4 py-3.5 text-sm text-whiteText outline-none focus:border-neon transition-all cursor-pointer appearance-none shadow-inner">
-                            <option value="adifonos">Audifonos</option>
+                            <option value="audifonos">Audífonos</option>
                             <option value="cargadores">Cargadores</option>
                             <option value="forros">Forros</option>
                             <option value="iluminacion">Iluminación</option>
@@ -163,7 +164,7 @@
             </form>
         </section>
 
-        <!-- Inventario en GitHub -->
+        <!-- Inventario en Supabase -->
         <section class="lg:col-span-7 bg-blackCard border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col h-[540px] sm:h-[620px] relative overflow-hidden">
             <div class="absolute -bottom-10 -right-10 w-36 h-36 bg-neon/10 rounded-full blur-[50px] pointer-events-none"></div>
             
@@ -172,7 +173,7 @@
                     <div class="w-8 h-8 rounded-lg bg-neon/10 border border-neon/40 flex items-center justify-center text-neon">
                         <i class="fa-solid fa-boxes-stacked"></i>
                     </div>
-                    Inventario GitHub
+                    Inventario en la Nube
                 </h2>
                 <span class="bg-blackBg border border-white/10 px-3.5 py-1.5 rounded-xl text-xs font-bold text-neon shadow-inner"><span id="countDisplay">0</span> publicadas</span>
             </div>
@@ -183,43 +184,46 @@
         </section>
     </main>
 
+    <!-- Modal de Confirmación para Eliminar -->
+    <div id="delete-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-blackCard border border-neon/40 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
+            <div class="w-12 h-12 mx-auto bg-red-500/10 border border-red-500/40 rounded-full flex items-center justify-center mb-4 text-red-500">
+                <i class="fa-solid fa-trash-can text-xl"></i>
+            </div>
+            <h3 class="font-display font-bold text-lg text-whiteText mb-1">¿Eliminar Producto?</h3>
+            <p class="text-grayText text-xs mb-6">Esta acción borrará el producto del catálogo permanentemente.</p>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()" class="flex-1 py-2.5 rounded-xl bg-blackBg border border-white/10 text-grayText hover:text-whiteText text-xs font-bold uppercase transition-colors">Cancelar</button>
+                <button id="confirm-delete-btn" class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-xs font-bold uppercase transition-colors shadow-lg">Sí, Eliminar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast UI -->
-    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-blackCard border border-neon text-white px-5 py-3 rounded-2xl z-50 transform translate-y-20 opacity-0 transition-all duration-300 shadow-2xl flex items-center gap-3">
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-blackCard border border-neon text-white px-5 py-3 rounded-2xl z-50 transform translate-y-20 opacity-0 transition-all duration-300 shadow-2xl flex items-center gap-3 pointer-events-none">
         <i id="toastIcon" class="fa-solid fa-bolt text-neon"></i><span id="toastMsg" class="text-xs font-bold"></span>
     </div>
 
     <script>
         // =========================================================
-        // ⚡ CREDENCIALES SEGURAS (SIN QUEMAR EL TOKEN)
+        // ⚡ CONEXIÓN DIRECTA A SUPABASE (GUARISHOP STUDIO)
         // =========================================================
-        const IMGBB_API_KEY = "ef775dc438f7d06a6d81dbc15835901f"; 
-        const GITHUB_USER = "davipcgt-netizen"; 
-        const GITHUB_REPO = "TrendyShop"; 
-        const FILE_PATH = "guarishop_bd.json"; 
-        
-        // Buscamos si ya guardaste tu token en la memoria de tu navegador
-        let GITHUB_TOKEN = localStorage.getItem("davi_github_token");
+        const SUPABASE_URL = "https://jouqjbutkvqqvqgmzlux.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvdXFqYnV0a3ZxcXZxZ216bHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2MDM0OTYsImV4cCI6MjEwODE3OTQ5Nn0.MH8aHBdnsR99EFTf92OzXVi3oKNBKpuqjq5SYSAzsFI";
+        const BUCKET_NAME = "guarishop-fotos";
+        const TABLE_NAME = "guarishop_productos";
 
-        // Si no hay token guardado, te sale la ventanita para pedirlo
-        if (!GITHUB_TOKEN) {
-            GITHUB_TOKEN = prompt("Ingresa tu nuevo Token de GitHub (empieza con ghp_):");
-            if (GITHUB_TOKEN) {
-                // Se guarda en tu navegador para que no te lo pida a cada rato
-                localStorage.setItem("davi_github_token", GITHUB_TOKEN.trim());
-            } else {
-                alert("⚠ Error: Sin el token no podrás guardar productos.");
-            }
-        }
-        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         let selectedFile = null;
         let memoryProducts = [];
-        let currentSha = null;
+        let productToDeleteId = null;
 
         function showToast(msg, isError = false) {
             const t = document.getElementById('toast');
             document.getElementById('toastMsg').textContent = msg;
             document.getElementById('toastIcon').className = `fa-solid ${isError ? 'fa-triangle-exclamation text-red-500' : 'fa-bolt text-neon'}`;
-            t.className = `fixed bottom-6 left-1/2 -translate-x-1/2 bg-blackCard border ${isError ? 'border-red-500' : 'border-neon/60'} text-white px-5 py-3 rounded-2xl z-50 transform transition-all duration-300 shadow-2xl flex items-center gap-3 translate-y-0 opacity-100`;
+            t.className = `fixed bottom-6 left-1/2 -translate-x-1/2 bg-blackCard border ${isError ? 'border-red-500' : 'border-neon/60'} text-white px-5 py-3 rounded-2xl z-50 transform transition-all duration-300 shadow-2xl flex items-center gap-3 translate-y-0 opacity-100 pointer-events-none`;
             setTimeout(() => { t.classList.add('translate-y-20', 'opacity-0'); }, 4000);
         }
 
@@ -250,87 +254,52 @@
             document.getElementById('imagePreview').src = "";
         }
 
+        // 1. Leer productos desde la tabla de Supabase
         async function fetchProducts() {
-            setStatus("Leyendo nube...", "neon", "fa-circle-notch animate-spin");
-            const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
-            
+            setStatus("Sincronizando...", "neon", "fa-circle-notch animate-spin");
             try {
-                const response = await fetch(url, {
-                    headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
-                });
+                const { data, error } = await supabaseClient
+                    .from(TABLE_NAME)
+                    .select('*')
+                    .order('id', { ascending: false });
 
-                if (response.status === 404) {
-                    memoryProducts = [];
-                    currentSha = null;
-                    setStatus("GitHub Listo", "neon", "fa-check");
-                    renderInventory();
-                    return;
-                }
+                if (error) throw error;
 
-                if (!response.ok) throw new Error(`GitHub rechazó la conexión. Código: ${response.status}`);
-
-                const result = await response.json();
-                currentSha = result.sha; 
-                
-                const cleanContent = result.content.replace(/\s/g, ''); 
-                const decodedText = decodeURIComponent(escape(window.atob(cleanContent)));
-                memoryProducts = JSON.parse(decodedText);
-                
-                setStatus("GitHub Conectado", "neon", "fa-check");
+                memoryProducts = data || [];
+                setStatus("Supabase Activo", "neon", "fa-check");
                 renderInventory();
 
             } catch (error) {
-                console.error("Error leyendo GitHub:", error);
-                setStatus("Fallo conexión", "red-500", "fa-triangle-exclamation");
+                console.error("Error leyendo Supabase:", error);
+                setStatus("Error BD", "red-500", "fa-triangle-exclamation");
                 showToast(`Error: ${error.message}`, true);
             }
         }
 
-        async function saveToGitHub() {
-            const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
-            const jsonString = JSON.stringify(memoryProducts, null, 2);
-            const contentBase64 = window.btoa(unescape(encodeURIComponent(jsonString)));
+        // 2. Subir foto al Bucket de Supabase Storage
+        async function uploadImageToSupabase(file) {
+            const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+            const fileName = `prod_${Date.now()}_${cleanName}`;
 
-            const body = {
-                message: `Actualización GuariShop Studio`,
-                content: contentBase64
-            };
-            if (currentSha) body.sha = currentSha;
+            const { error: uploadError } = await supabaseClient.storage
+                .from(BUCKET_NAME)
+                .upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
 
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${GITHUB_TOKEN}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(body)
-            });
-
-            if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(`Fallo guardando en GitHub: ${errData.message}`);
+            if (uploadError) {
+                throw new Error(`Error subiendo imagen: ${uploadError.message}`);
             }
-            const result = await response.json();
-            currentSha = result.content.sha;
+
+            const { data: urlData } = supabaseClient.storage
+                .from(BUCKET_NAME)
+                .getPublicUrl(fileName);
+
+            return urlData.publicUrl;
         }
 
-        async function uploadImageToImgBB(file) {
-            const formData = new FormData();
-            formData.append('image', file);
-            
-            const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                method: 'POST',
-                body: formData
-            });
-            
-            const result = await response.json();
-            if (result.success) {
-                return result.data.url; 
-            } else {
-                throw new Error(`ImgBB Error: ${result.error.message}`);
-            }
-        }
-
+        // 3. Guardar producto al enviar formulario
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!selectedFile) return showToast("Falta seleccionar una imagen", true);
@@ -339,54 +308,75 @@
             btn.classList.add('disabled-btn');
             
             try {
-                btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> 1/2 Subiendo foto...`;
-                const imgUrl = await uploadImageToImgBB(selectedFile);
+                btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> 1/2 Subiendo foto a Supabase...`;
+                const imgUrl = await uploadImageToSupabase(selectedFile);
 
+                btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> 2/2 Guardando en Base de Datos...`;
                 const newProduct = {
-                    id: Date.now().toString(),
-                    name: document.getElementById('productName').value,
+                    name: document.getElementById('productName').value.trim(),
                     category: document.getElementById('productCategory').value,
                     price: parseFloat(document.getElementById('productPrice').value),
-                    img: imgUrl, 
-                    timestamp: new Date().toISOString()
+                    img: imgUrl
                 };
 
-                memoryProducts.unshift(newProduct);
+                const { error: insertError } = await supabaseClient
+                    .from(TABLE_NAME)
+                    .insert([newProduct]);
 
-                btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> 2/2 Guardando producto...`;
-                await saveToGitHub();
+                if (insertError) throw insertError;
 
-                showToast("¡Producto publicado con éxito en la nube!");
+                showToast("¡Producto publicado con éxito!");
                 resetForm();
-                renderInventory();
+                await fetchProducts();
 
             } catch (error) {
                 console.error("Fallo al publicar:", error);
                 showToast(`Error: ${error.message}`, true);
             } finally {
                 btn.classList.remove('disabled-btn');
-                btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Publicar Producto`;
+                btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up text-base"></i> Publicar Producto`;
             }
         });
 
-        window.deleteProduct = async function(id) {
-            if(!confirm("¿Seguro que deseas eliminar este producto permanentemente?")) return;
-            
+        // 4. Modal y función para eliminar producto
+        window.askDeleteProduct = function(id) {
+            productToDeleteId = id;
+            const modal = document.getElementById('delete-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeDeleteModal = function() {
+            productToDeleteId = null;
+            const modal = document.getElementById('delete-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+            if (!productToDeleteId) return;
+            const idToRemove = productToDeleteId;
+            closeDeleteModal();
+
             try {
-                memoryProducts = memoryProducts.filter(p => p.id !== id);
-                setStatus("Borrando...", "neon", "fa-circle-notch animate-spin");
-                await saveToGitHub();
-                
+                setStatus("Eliminando...", "neon", "fa-circle-notch animate-spin");
+                const { error } = await supabaseClient
+                    .from(TABLE_NAME)
+                    .delete()
+                    .eq('id', idToRemove);
+
+                if (error) throw error;
+
                 showToast("Producto eliminado correctamente");
-                setStatus("GitHub Conectado", "neon", "fa-check");
-                renderInventory();
+                await fetchProducts();
             } catch (error) {
                 console.error("Fallo al borrar:", error);
                 showToast(`Error eliminando: ${error.message}`, true);
                 setStatus("Error", "red-500", "fa-xmark");
             }
-        }
+        });
 
+        // 5. Renderizar lista de inventario
         function renderInventory() {
             const list = document.getElementById('inventoryList');
             document.getElementById('countDisplay').textContent = memoryProducts.length;
@@ -399,16 +389,16 @@
             list.innerHTML = memoryProducts.map(p => `
                 <div class="flex items-center justify-between bg-blackBg p-3.5 rounded-2xl border border-white/5 hover:border-neon/40 transition-all group shadow-sm">
                     <div class="flex items-center gap-3.5">
-                        <img src="${p.img}" class="w-14 h-14 object-cover rounded-xl border border-white/10 bg-blackCard" onerror="this.src='https://placehold.co/100x100?text=Error'"/>
+                        <img src="${p.img}" class="w-14 h-14 object-cover rounded-xl border border-white/10 bg-blackCard" onerror="this.src='https://placehold.co/100x100/0f1115/39ff14?text=Sin+Foto'"/>
                         <div>
                             <h4 class="text-xs sm:text-sm font-bold text-whiteText truncate max-w-[160px] sm:max-w-[240px] group-hover:text-neon transition-colors">${p.name}</h4>
                             <div class="flex gap-2.5 items-center mt-1">
-                                <span class="text-neon text-xs font-black">$${p.price.toFixed(2)}</span>
+                                <span class="text-neon text-xs font-black">$${parseFloat(p.price).toFixed(2)}</span>
                                 <span class="text-[9px] bg-blackCard border border-white/10 px-2 py-0.5 rounded-md text-grayText uppercase font-semibold">${p.category}</span>
                             </div>
                         </div>
                     </div>
-                    <button onclick="deleteProduct('${p.id}')" class="w-9 h-9 rounded-xl flex items-center justify-center text-grayText hover:text-red-400 hover:bg-red-500/10 transition-all active:scale-90" title="Eliminar"><i class="fa-solid fa-trash-can"></i></button>
+                    <button onclick="askDeleteProduct('${p.id}')" class="w-9 h-9 rounded-xl flex items-center justify-center text-grayText hover:text-red-400 hover:bg-red-500/10 transition-all active:scale-90" title="Eliminar"><i class="fa-solid fa-trash-can"></i></button>
                 </div>
             `).join('');
         }
